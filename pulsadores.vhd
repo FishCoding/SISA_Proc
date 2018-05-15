@@ -17,28 +17,46 @@ END pulsadores;
 ARCHITECTURE Structure OF pulsadores IS
 		signal intr_s : STD_LOGIC := '0';
 		signal pulse : std_logic := '0';
-		signal keys_mem : std_logic_vector(3 downto 0) := "0000";
+		signal keys_mem : std_logic_vector(3 downto 0) := "1111";
 BEGIN
 
-  divisor_clk_20 : PROCESS(clk,inta,keys)
-	begin
-		
-		if rising_edge(clk) then
-			
+	process (clk, boot, keys, inta) begin
+		if boot = '1' then
+			intr_s <= '0';
+			pulse <= '0';
+			keys_mem <= "1111";
+		elsif rising_edge(clk) then
 			if inta = '1' then
 				intr_s <= '0';
-			
-			elsif intr_s = '0' and keys /= "0000" and pulse = '0' then 
-				keys_mem <= keys;
-				intr_s <= '1';
+			elsif keys /= "1111" and pulse = '0' then
 				pulse <= '1';
-			elsif keys = "0000"  then
+				intr_s <= '1';
+				keys_mem <= keys;
+			elsif keys = "1111" then
 				pulse <= '0';
-			
 			end if;
 		end if;
-		
 	end process;
+  
+  --divisor_clk_20 : PROCESS(clk,inta,keys)
+--	begin
+--		
+--		if rising_edge(clk) then
+--			
+--			if inta = '1' then
+--				intr_s <= '0';
+--			
+--			elsif intr_s = '0' and keys /= "0000" and pulse = '0' then 
+--				keys_mem <= keys;
+--				intr_s <= '1';
+--				pulse <= '1';
+--			elsif keys = "0000"  then
+--				pulse <= '0';
+--			
+--			end if;
+--		end if;
+		
+--	end process;
 	
 	intr <= intr_s;
 	read_key <= keys_mem;

@@ -20,10 +20,13 @@ ARCHITECTURE Structure OF interruptores IS
 		signal intr_s : std_logic := '0';
 BEGIN
 
- divisor_clk_20 : PROCESS(clk,inta)
+ divisor_clk_20 : PROCESS(clk,inta, boot)
 	begin
 		
-		if rising_edge(clk) then
+		if boot = '1' then
+			intr_s <= '0';
+			switches_mem <= x"00";
+		elsif rising_edge(clk) then
 			if inta = '1' then
 				intr_s <= '0';
 			
