@@ -23,7 +23,8 @@ ENTITY multi IS
 			inta_l : IN STD_LOGIC;
 			inta : out std_logic;
 			intr : IN STD_LOGIC;
-			state_word : IN STD_LOGIC_VECTOR(15 downto 0)
+			state_word : IN STD_LOGIC_VECTOR(15 downto 0);
+			excepr : IN STD_LOGIC
 			
 			);
 END multi;
@@ -42,7 +43,7 @@ begin
 		case estado_actual is
 			when FETCH => estado_actual <= DEMW;
 			when DEMW => 
-				if intr ='1' and state_word(1) = '1' then
+				if ( intr ='1' or excepr='1' )  and state_word(1) = '1' then
 					estado_actual <= SYSTEM;
 				else
 					estado_actual <=FETCH;

@@ -30,7 +30,7 @@ BEGIN
 			else
 				counter_s <= counter_s + 1;
 				if counter_s = x"2625A0" then 
-			--   if counter_s = x"FFFFFF" then 
+			   --if counter_s = x"FFFFFF" then 
 					counter_s <= x"000000";
 					intr <= '1';
 				end if;

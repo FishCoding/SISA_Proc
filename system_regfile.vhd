@@ -16,7 +16,8 @@ ENTITY system_regfile IS
 			 disable_int : IN STD_LOGIC;
 			 reti : IN STD_LOGIC;
 			 boot : IN STD_LOGIC;
-			 state_word : OUT STD_LOGIC_VECTOR(15 downto 0));
+			 state_word : OUT STD_LOGIC_VECTOR(15 downto 0);
+			 id_excep : IN STD_LOGIC_VECTOR(3 downto 0));
 END system_regfile;
 
 
@@ -40,7 +41,7 @@ BEGIN
 			elsif sys='1' then --
 				BR(0) <= BR(7);
 				BR(1) <= pc ;-- ??????????????????
-				BR(2) <= x"000F";
+				BR(2) <= x"000" & id_excep;
 				BR(7)(1) <= '0';
 			elsif enable_int = '1' then
 				BR(7)(1) <= '1';

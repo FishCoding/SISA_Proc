@@ -8,7 +8,9 @@ ENTITY alu IS
           y  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0); 
           op : IN  STD_LOGIC_VECTOR(6 DOWNTO 0); 
           z  : out std_logic; 
-          w  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)); 
+          w  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			 invalid_division : OUT STD_LOGIC
+			 ); 
 END alu; 
  
 ARCHITECTURE Structure OF alu IS 
@@ -105,9 +107,12 @@ BEGIN
 	 mul_s <= mul_int(15 downto 0); 
 	 mulh_s <= mul_int(31 downto 16); 
     mulhu_s <= mul_uint(31 downto 16); 
-    div_s <= "XXXXXXXXXXXXXXXX" when x(15 downto 0) = x"8000" and y(15 downto 0) = x"FFFF" else
-				 std_logic_vector(signed(x)/signed(y)); 
-    divu_s <= std_logic_vector(unsigned(x)/unsigned(y)); 
+    div_s <= "XXXXXXXXXXXXXXXX" when (x(15 downto 0) = x"8000" and y(15 downto 0) = x"FFFF") or y(15 downto 0) = x"0000" else
+				 std_logic_vector(signed(x)/signed(y)) ; 
+    divu_s <= "XXXXXXXXXXXXXXXX" when y(15 downto 0) = x"0000" else std_logic_vector(unsigned(x)/unsigned(y)); 
+	 
+	 invalid_division <= '1' when (op(6 downto 0) = "1000100" or op(6 downto 0) = "1000101") and y = x"0000" else
+								'0'; -- DIV OR DIVU
    
 	 --Bloque Movimiento
 	 movi_s <= y;

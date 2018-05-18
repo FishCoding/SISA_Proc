@@ -36,7 +36,9 @@ ENTITY unidad_control IS
 		getiid : OUT std_logic;
 		inta : out std_logic;
 		intr : in std_logic;
-		state_word : IN STD_LOGIC_VECTOR(15 downto 0)
+		state_word : IN STD_LOGIC_VECTOR(15 downto 0);
+		invalid_instr : OUT STD_LOGIC;
+		excepr : IN STD_LOGIC
 		);
 END unidad_control;
 
@@ -73,7 +75,8 @@ ARCHITECTURE Structure OF unidad_control IS
 			 disable_int : OUT STD_LOGIC;
 			 reti : OUT STD_LOGIC;
 			 inta : out std_logic;
-			 getiid : OUT std_logic
+			 getiid : OUT std_logic;
+			 invalid_instr : OUT std_logic
 			
 		);
 	END COMPONENT;
@@ -102,7 +105,8 @@ ARCHITECTURE Structure OF unidad_control IS
 			inta_l : IN std_logic;
 			inta : out std_logic;
 			intr : in std_logic;
-			state_word : IN STD_LOGIC_VECTOR(15 downto 0));
+			state_word : IN STD_LOGIC_VECTOR(15 downto 0);
+			excepr : IN STD_LOGIC);
 END COMPONENT;
 
 signal ir_signal : std_logic_vector(15 DOWNTO 0);
@@ -144,7 +148,8 @@ BEGIN
 		disable_int => disable_int,
 		reti => reti,
 		getiid => getiid,
-		inta => inta_l_s);
+		inta => inta_l_s,
+		invalid_instr => invalid_instr);
 		
 	logicamulticiclo : multi
 	PORT MAP( 
@@ -169,7 +174,8 @@ BEGIN
 			intr => intr,
 			inta => inta,
 			state_word => state_word,
-			inta_l => inta_l_s
+			inta_l => inta_l_s,
+			excepr => excepr
 		
 			);
 

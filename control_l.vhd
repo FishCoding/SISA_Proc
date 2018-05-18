@@ -27,7 +27,8 @@ ENTITY control_l IS
 			 disable_int : OUT STD_LOGIC;
 			 reti : OUT STD_LOGIC;
 			 getiid : OUT std_logic;
-			 inta : OUT STD_LOGIC);
+			 inta : OUT STD_LOGIC;
+			 invalid_instr : OUT STD_LOGIC);
 END control_l;
 
 
@@ -46,6 +47,14 @@ BEGIN
 			   --  "10"; -- when ir(15 downto 12) es 0011 o 0100 o 1101 o 1110
 	low_ir <= ir (5 downto 0);
 	
+	invalid_instr <= '1' when (ir(15 downto 12) = "1010" and (ir(5 downto 3) /= "000" or ir(2 downto 0) = "010" or ir(2 downto 0) = "101" or ir(2 downto 0) ="110" or ir(2 downto 0) ="111")) or  -- Jumps
+							  (ir(15 downto 12) = "0001" and (ir(5 downto 3)  = "010" or ir(5 downto 3) = "110" or ir(5 downto 3) = "111")) or -- Compare Instructions
+							  (ir(15 downto 12) = "1000" and (ir(5 downto 3)  = "011" or ir(5 downto 3) = "110" or ir(5 downto 3) = "111")) or -- Multiplicacion Division
+							  (ir(15 downto 12) = "1001") or -- Floats
+							   ir(15 downto 12) = "1011" or ir(15 downto 12) = "1100" or -- Load Store Floats
+							  (ir(15 downto 12) = "1111" and (ir(5) = '0' or (ir(4 downto 0) /= "00000" and ir(4 downto 0) /= "00001" and ir(4 downto 0) /= "00100" and ir(4 downto 0) /= "01000" and  ir(4 downto 0) /= "01100" and ir(4 downto 0) /= "10000" and ir(4 downto 0) /= "11111"))) else
+								'0';
+
 	with ir(15 downto 0) select
 			ldpc <= '0' when x"FFFF",
 					  '1' when others;

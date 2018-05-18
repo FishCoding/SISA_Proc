@@ -25,13 +25,13 @@ ARCHITECTURE Structure OF proc IS
 signal z_s : STD_LOGIC;
    COMPONENT datapath IS
 		PORT (clk    : IN STD_LOGIC;
-			   op     : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
-			   wrd    : IN STD_LOGIC;
+			    op     : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+			    wrd    : IN STD_LOGIC;
 				d_sys  : IN STD_LOGIC;
 				a_sys  : IN STD_LOGIC;
-			   addr_a : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-		   	addr_d : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-		   	immed  : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+			    addr_a : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+		   		addr_d : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+		   		immed  : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 				addr_b : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
 				immed_x2 : IN STD_LOGIC;
 				datard_m : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -50,7 +50,9 @@ signal z_s : STD_LOGIC;
 				disable_int : IN STD_LOGIC;
 				reti : IN STD_LOGIC;
 				boot : IN STD_LOGIC;
-				state_word : OUT STD_LOGIC_VECTOR(15 downto 0)
+				state_word : OUT STD_LOGIC_VECTOR(15 downto 0);
+				invalid_division : out STD_LOGIC;
+				id_excep : IN STD_LOGIC_VECTOR(3 downto 0)
 				);
 				
 	END COMPONENT;
@@ -85,10 +87,26 @@ signal z_s : STD_LOGIC;
 				reti : OUT STD_LOGIC;
 				getiid : OUT std_logic;
 				inta : out std_logic;
-			   intr : in std_logic;
-				state_word : IN STD_LOGIC_VECTOR(15 downto 0)
+			    intr : in std_logic;
+				state_word : IN STD_LOGIC_VECTOR(15 downto 0);
+				invalid_instr : OUT STD_LOGIC;
+				excepr : IN STD_LOGIC
+
 				
 				);
+	END component;
+
+	component exception_controller IS
+    PORT (
+	   op : IN STD_LOGIC_VECTOR(9 downto 0);
+		byte_word : IN STD_LOGIC;
+		addr : IN STD_LOGIC_VECTOR(15 downto 0);
+		exception_value : OUT STD_LOGIC_VECTOR(3 downto 0);
+		excepr : OUT STD_LOGIC;
+		invalid_division : IN STD_LOGIC;
+		intr : IN STD_LOGIC;
+		invalid_instr : IN STD_LOGIC
+		);
 	END component;
 	
 	signal op_signal : std_logic_vector(9 DOWNTO 0);
@@ -117,6 +135,16 @@ signal z_s : STD_LOGIC;
 	signal reti_s : std_logic;
 	
 	signal state_word_s : std_logic_vector(15 downto 0);
+
+	signal addr_m_s : std_logic_vector(15 downto 0);
+	signal exception_value_s : std_logic_vector(3 downto 0);
+	signal invalid_division_s : std_logic := '0';
+	signal invalid_instr_s : std_logic := '0';
+
+	signal intr_s : std_logic;
+
+	signal except_s : std_logic;
+
 BEGIN
 	
 	unidadcontrol0 : unidad_control
@@ -148,8 +176,10 @@ BEGIN
 				 reti => reti_s,
 				 getiid => getiid,
 				 inta => inta,
-				 intr => intr,
-				 state_word => state_word_s);
+				 intr => intr_s,
+				 state_word => state_word_s,
+				 invalid_instr => invalid_instr_s,
+				 excepr => except_s);
 				 
 	datapath0 : datapath
 	PORT MAP( clk => clk, 
@@ -167,7 +197,7 @@ BEGIN
 				 pc => pc_signal,
 				 in_d => in_d_signal,
 				 data_wr =>  data_wr,
-				 addr_m => addr_m,
+				 addr_m => addr_m_s,
 				 tknbr => tknbr_s,
 				 jump_addr => jump_addr_s,
 				 rd_io => rd_io,
@@ -177,6 +207,25 @@ BEGIN
 				 disable_int => disable_int_s,
 				 reti => reti_s,
 				 boot => boot,
-				 state_word => state_word_s);
+				 state_word => state_word_s,
+				 invalid_division => invalid_division_s,
+				 id_excep =>exception_value_s
+
+		);
+		excep_controller : exception_controller
+		PORT MAP(
+			op => op_signal,
+			byte_word => wrd_signal,
+			addr => addr_m_s,
+			exception_value => exception_value_s,
+			excepr => except_s,
+			invalid_division => invalid_division_s,
+			invalid_instr => invalid_instr_s,
+			intr => intr_s
+		);
+		
+		addr_m <= addr_m_s;
+		
+		intr_s <= intr;
 
 END Structure;
