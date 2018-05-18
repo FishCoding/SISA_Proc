@@ -43,7 +43,7 @@ begin
 		case estado_actual is
 			when FETCH => estado_actual <= DEMW;
 			when DEMW => 
-				if ( intr ='1' or excepr='1' )  and state_word(1) = '1' then
+				if ( intr ='1' or excepr='1' ) and state_word(1) = '1' then
 					estado_actual <= SYSTEM;
 				else
 					estado_actual <=FETCH;
