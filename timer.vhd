@@ -27,15 +27,16 @@ BEGIN
 				counter_s <= x"000000";
 			elsif inta='1' then
 				intr <= '0';
-			else
-				counter_s <= counter_s + 1;
-				if counter_s = x"2625A0" then 
-			   --if counter_s = x"FFFFFF" then 
+			end if;
+			
+			counter_s <= counter_s + 1;
+			if counter_s = x"2625A0" then 
+		--	if counter_s = x"000CC0" then 
 					counter_s <= x"000000";
 					intr <= '1';
-				end if;
 			end if;
 		end if;
+		
 		
 	end process;
 

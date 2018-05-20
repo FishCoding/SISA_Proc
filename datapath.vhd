@@ -33,7 +33,8 @@ entity datapath is
 		boot : in STD_LOGIC;
 		state_word : out STD_LOGIC_VECTOR(15 downto 0);
 		invalid_division : out STD_LOGIC;
-		id_excep : IN STD_LOGIC_VECTOR(3 downto 0)
+		id_excep : IN STD_LOGIC_VECTOR(3 downto 0);
+		value_data 		  : IN STD_LOGIC_VECTOR(15 downto 0)
 	);
 end datapath;
 architecture Structure of datapath is
@@ -78,7 +79,8 @@ architecture Structure of datapath is
 			reti : in STD_LOGIC;
 			boot : in STD_LOGIC;
 			state_word : out STD_LOGIC_VECTOR(15 downto 0);
-			id_excep : IN STD_LOGIC_VECTOR(3 downto 0)
+			id_excep : IN STD_LOGIC_VECTOR(3 downto 0);
+			value_data : IN STD_LOGIC_VECTOR(15 downto 0)
 		);
 	end component;
 
@@ -93,6 +95,9 @@ architecture Structure of datapath is
 	signal a_R : std_logic_vector(15 downto 0);
  
 	signal write_reg : std_logic_vector(15 downto 0);
+
+	signal a_reg  : std_logic_vector(15 downto 0);
+
 begin
 	with in_d select
 	a_escribir <= salida_alu when "00", 
@@ -100,9 +105,15 @@ begin
 	              std_logic_vector(unsigned(pc) + 2) when "10", 
 	              rd_io when others;
  
- 
- 
-	write_reg <= a_escribir;--a_S when op(9 downto 0) = "1111101100" else
+	
+
+	process(clk,boot) begin
+		if rising_edge(clk) then	
+			a_reg <= a_leer;		
+		end if;
+	end process;
+
+	write_reg <= a_reg when sys= '1' else a_escribir;--a_S when op(9 downto 0) = "1111101100" else
 	--a_R when op(9 downto 0) = "1111110000" else
 	--a_escribir;
  
@@ -135,8 +146,7 @@ begin
 	         "10" when (op(9 downto 3) = "1010000" and z_s = '1') or
 	         (op(9 downto 3) = "1010001" and z_s = '0') or
 	         op(9 downto 3) = "1010011" or
-	         op(9 downto 3) = "1010100" or
-	         op(9 downto 3) = "1010111" else
+	         op(9 downto 3) = "1010100"  else
 	         "00";
 	-- mover al control l
 	regR : regfile
@@ -155,7 +165,7 @@ begin
 	port map(
 		clk => clk, 
 		wrd => d_sys, 
-		d => a_escribir, 
+		d => write_reg, 
 		addr_a => addr_a, 
 		addr_d => addr_d, 
 		a => a_S, 
@@ -166,11 +176,12 @@ begin
 		reti => reti, 
 		boot => boot, 
 		state_word => state_word,
-		id_excep => id_excep
+		id_excep => id_excep,
+		value_data => value_data
 	);
  
  
-	with a_sys select
+	with a_sys select -- wrs rds
 	a_leer <= a_S when '1', 
 	          a_R when others;
  

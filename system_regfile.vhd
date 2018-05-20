@@ -17,7 +17,8 @@ ENTITY system_regfile IS
 			 reti : IN STD_LOGIC;
 			 boot : IN STD_LOGIC;
 			 state_word : OUT STD_LOGIC_VECTOR(15 downto 0);
-			 id_excep : IN STD_LOGIC_VECTOR(3 downto 0));
+			 id_excep : IN STD_LOGIC_VECTOR(3 downto 0);
+			 value_data : IN STD_LOGIC_VECTOR(15 downto 0));
 END system_regfile;
 
 
@@ -37,12 +38,18 @@ BEGIN
 	process(clk,boot) begin
 		if rising_edge(clk) then	
 			if boot='1' then
-				BR(7) <= x"0000";
+				BR(7) <= x"0001";
 			elsif sys='1' then --
 				BR(0) <= BR(7);
 				BR(1) <= pc ;-- ??????????????????
 				BR(2) <= x"000" & id_excep;
 				BR(7)(1) <= '0';
+				BR(7)(0) <= '1';
+				if id_excep = x"E" then 
+					BR(3) <= d;
+				elsif id_excep = x"1" then
+					BR(3) <= value_data;
+				end if;
 			elsif enable_int = '1' then
 				BR(7)(1) <= '1';
 			elsif disable_int = '1' then
