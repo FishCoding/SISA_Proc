@@ -59,15 +59,24 @@ BEGIN
                        x"6" when "01000000",
                        x"7" when others;--when "10000000",
 
-    with codificador select 
-        dir_f <= fisico(0) when x"0",
-                 fisico(1) when x"1",
-                 fisico(2) when x"2",
-                 fisico(3) when x"3",
-                 fisico(4) when x"4",
-                 fisico(5) when x"5",
-                 fisico(6) when x"6",
-                 fisico(7) when others;--x"7";
+   -- with codificador select 
+   --     dir_f <= fisico(0) when x"0",
+   --              fisico(1) when x"1",
+   --              fisico(2) when x"2",
+   --              fisico(3) when x"3",
+   --              fisico(4) when x"4",
+   --              fisico(5) when x"5",
+   --              fisico(6) when x"6",
+   --              fisico(7) when others;--x"7";
+
+	dir_f <= fisico(0) when n_vir(0) = '1' else
+             fisico(1) when n_vir(1) = '1' else
+             fisico(2) when n_vir(2) = '1' else
+             fisico(3) when n_vir(3) = '1' else
+             fisico(4) when n_vir(4) = '1' else
+             fisico(5) when n_vir(5) = '1' else
+             fisico(6) when n_vir(6) = '1' else
+             fisico(7) ;--x"7";
 
     v <= not dir_f(5);
     r <= not dir_f(4);
