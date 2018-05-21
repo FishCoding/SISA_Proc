@@ -5,20 +5,20 @@ USE ieee.std_logic_unsigned.all; --Esta libreria sera necesaria si usais convers
 
 ENTITY system_regfile IS
     PORT (clk    : IN  STD_LOGIC;
-          wrd    : IN  STD_LOGIC;
-          d      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-          addr_a : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-          addr_d : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-          a      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 sys 	  : IN STD_LOGIC;
-			 pc 	  : IN STD_LOGIC_VECTOR(15 downto 0);
-			 enable_int : IN STD_LOGIC;
-			 disable_int : IN STD_LOGIC;
-			 reti : IN STD_LOGIC;
-			 boot : IN STD_LOGIC;
-			 state_word : OUT STD_LOGIC_VECTOR(15 downto 0);
-			 id_excep : IN STD_LOGIC_VECTOR(3 downto 0);
-			 value_data : IN STD_LOGIC_VECTOR(15 downto 0));
+         wrd    : IN  STD_LOGIC;
+         d      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+         addr_a : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+         addr_d : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+         a      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+		 sys 	  : IN STD_LOGIC;
+		 pc 	  : IN STD_LOGIC_VECTOR(15 downto 0);
+		 enable_int : IN STD_LOGIC;
+		 disable_int : IN STD_LOGIC;
+		 reti : IN STD_LOGIC;
+		 boot : IN STD_LOGIC;
+		 state_word : OUT STD_LOGIC_VECTOR(15 downto 0);
+		 id_excep : IN STD_LOGIC_VECTOR(3 downto 0);
+		 value_data : IN STD_LOGIC_VECTOR(15 downto 0));
 END system_regfile;
 
 
@@ -48,6 +48,8 @@ BEGIN
 				if id_excep = x"E" then 
 					BR(3) <= d;
 				elsif id_excep = x"1" then
+					BR(3) <= value_data;
+				elsif id_excep = x"6" or id_excep = x"7" then
 					BR(3) <= value_data;
 				end if;
 			elsif enable_int = '1' then

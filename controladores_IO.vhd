@@ -13,7 +13,7 @@ ENTITY controladores_IO IS
 		wr_out : in std_logic;
 		rd_in : in std_logic;
 		led_verdes : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-		led_rojos : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+		led_rojos : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
 		ps2_clk  : inout std_logic; 
 		ps2_data : inout std_logic;
 		display 	: out   STD_LOGIC_VECTOR(15 downto 0);
@@ -104,7 +104,7 @@ signal read_switch_s : std_logic_vector(7 downto 0);
 BEGIN
 
 	led_verdes <= B_IO(5)(7 downto 0);
-	led_rojos  <= B_IO(6)(7 downto 0);
+	led_rojos  <= B_IO(6)(9 downto 0);
 	display <= B_IO(10)(15 downto 0);
 	
 	to_write <= "00000000" & read_char_s when addr_io = x"F" else

@@ -33,7 +33,12 @@ ENTITY control_l IS
 		inta          : OUT STD_LOGIC;
 		invalid_instr : OUT STD_LOGIC;
 		calls         : OUT STD_LOGIC;
-		instr_protected : OUT STD_LOGIC
+		instr_protected : OUT STD_LOGIC;
+		flush         : OUT STD_LOGIC;
+		wr_tlb_pi      : OUT STD_LOGIC;
+		wr_tlb_pd      : OUT STD_LOGIC;
+		wr_tlb_vi      : OUT STD_LOGIC;
+		wr_tlb_vd      : OUT STD_LOGIC
 	);
 END control_l;
 ARCHITECTURE Structure OF control_l IS
@@ -55,12 +60,27 @@ BEGIN
 	                 (ir(15 DOWNTO 12) = "1000" AND (ir(5 DOWNTO 3) = "011" OR ir(5 DOWNTO 3) = "110" OR ir(5 DOWNTO 3) = "111")) OR -- Multiplicacion Division
 	                 (ir(15 DOWNTO 12) = "1001") OR -- Floats
 	                 ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" OR -- Load Store Floats
-	                 (ir(15 DOWNTO 12) = "1111" AND (ir(5) = '0' OR (ir(4 DOWNTO 0) /= "00000" AND ir(4 DOWNTO 0) /= "00001" AND ir(4 DOWNTO 0) /= "00100" AND ir(4 DOWNTO 0) /= "01000" AND ir(4 DOWNTO 0) /= "01100" AND ir(4 DOWNTO 0) /= "10000" AND ir(4 DOWNTO 0) /= "11111"))) ELSE
+					 (ir(15 DOWNTO 12) = "1111" AND (ir(5) = '0' OR (ir(4 DOWNTO 0) /= "00000" AND ir(4 DOWNTO 0) /= "00001" 
+							 AND ir(4 DOWNTO 0) /= "00100" AND ir(4 DOWNTO 0) /= "01000" AND ir(4 DOWNTO 0) /= "01100" 
+							 AND ir(4 DOWNTO 0) /= "10000"  AND ir(4 DOWNTO 0) /= "10100" AND ir(4 DOWNTO 0) /= "10101" 
+							 AND ir(4 DOWNTO 0) /= "10110" AND ir(4 DOWNTO 0) /= "10111" AND ir(4 DOWNTO 0) /= "11000"
+							 AND ir(4 DOWNTO 0) /= "11111"))) ELSE
 	                 '0';
 
 	
-	instr_protected <= '1' when (ir(15 DOWNTO 12) = "1111" AND (ir(5) = '0' OR (ir(4 DOWNTO 0) = "00000" OR ir(4 DOWNTO 0) = "00001" OR ir(4 DOWNTO 0) = "00100" OR ir(4 DOWNTO 0) = "01000" OR ir(4 DOWNTO 0) = "01100" OR ir(4 DOWNTO 0) = "10000"))) and state_word(0) = '0' else 
-					   '0';
+	instr_protected <= '1' when (ir(15 DOWNTO 12) = "1111" AND (ir(5) = '0' OR (ir(4 DOWNTO 0) = "00000" OR ir(4 DOWNTO 0) = "00001" 
+									OR ir(4 DOWNTO 0) = "00100" OR ir(4 DOWNTO 0) = "01000" OR ir(4 DOWNTO 0) = "01100" 
+									OR ir(4 DOWNTO 0) = "10000" OR ir(4 DOWNTO 0) = "10100" OR ir(4 DOWNTO 0) = "10101" 
+									OR ir(4 DOWNTO 0) = "10110" OR ir(4 DOWNTO 0) = "10111" OR ir(4 DOWNTO 0) = "11000"))) 
+									and state_word(0) = '0'  else 
+					   '0'; --Añadir IN, OUT y HALT (?)
+
+
+	flush <= '1' when ir(15 downto 12) = "1111" and ir(5 downto 0) = "111000" and state_word(0) = '1' else '0';
+	wr_tlb_pi    <= '1' when ir(15 downto 12) = "1111" and ir(5 downto 0) = "110100" and state_word(0) = '1' else '0';
+	wr_tlb_pd    <= '1' when ir(15 downto 12) = "1111" and ir(5 downto 0) = "110110" and state_word(0) = '1' else '0';
+	wr_tlb_vi    <= '1' when ir(15 downto 12) = "1111" and ir(5 downto 0) = "110101" and state_word(0) = '1' else '0';
+	wr_tlb_vd    <= '1' when ir(15 downto 12) = "1111" and ir(5 downto 0) = "110111" and state_word(0) = '1' else '0';
 
 	WITH ir(15 DOWNTO 0) SELECT
 	ldpc <= '0' WHEN x"FFFF", 
@@ -76,7 +96,9 @@ BEGIN
  
 	addr_io <= ir(7 DOWNTO 0);
  
-	wrd     <= '0' WHEN (ir(15 DOWNTO 12) = "1111" AND ir(4 DOWNTO 0) /= "01100" AND ir(4 DOWNTO 0) /= "01000")OR ir(15 DOWNTO 12) = "0100" OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0110" OR operation(9 DOWNTO 5) = "10100" OR operation(9 DOWNTO 5) = "01111" ELSE
+	wrd     <= '0' WHEN (ir(15 DOWNTO 12) = "1111" AND ir(4 DOWNTO 0) /= "01100" AND ir(4 DOWNTO 0) /= "01000")OR ir(15 DOWNTO 12) = "0100" 
+						OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0110" OR operation(9 DOWNTO 5) = "10100" 
+						OR operation(9 DOWNTO 5) = "01111" ELSE
 	     	   '1';
 	d_sys <= '1' WHEN ir(15 DOWNTO 12) = "1111" AND ir(5 DOWNTO 0) = "110000" ELSE
 	         '0';
@@ -95,8 +117,10 @@ BEGIN
 	disable_int <= '1' WHEN ir(15 DOWNTO 12) = "1111" AND ir(5 DOWNTO 0) = "100001" ELSE '0';
  
  
-	addr_b      <= ir(11 DOWNTO 9) WHEN ir(15 DOWNTO 12) = "0100" OR ir(15 DOWNTO 12) = "0110" OR ir(15 DOWNTO 12) = "0111" OR ir(15 DOWNTO 12) = "1010" OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0111" ELSE
-	          ir(2 DOWNTO 0);
+	addr_b <= ir(11 DOWNTO 9) WHEN ir(15 DOWNTO 12) = "0100" OR ir(15 DOWNTO 12) = "0110" OR ir(15 DOWNTO 12) = "0111" 
+					OR ir(15 DOWNTO 12) = "1010" OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0111" 
+					OR ir(15 DOWNTO 12) = "1111" ELSE
+			  ir(2 DOWNTO 0);
  
 	addr_d <= ir(11 DOWNTO 9);
  

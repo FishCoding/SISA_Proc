@@ -34,7 +34,9 @@ entity datapath is
 		state_word : out STD_LOGIC_VECTOR(15 downto 0);
 		invalid_division : out STD_LOGIC;
 		id_excep : IN STD_LOGIC_VECTOR(3 downto 0);
-		value_data 		  : IN STD_LOGIC_VECTOR(15 downto 0)
+		value_data 		  : IN STD_LOGIC_VECTOR(15 downto 0);
+		a : out std_logic_vector(15 downto 0);
+		b : out std_logic_vector(15 downto 0)
 	);
 end datapath;
 architecture Structure of datapath is
@@ -149,6 +151,10 @@ begin
 	         op(9 downto 3) = "1010100"  else
 	         "00";
 	-- mover al control l
+	
+	a <= a_R;
+	b <= reg_b;
+	
 	regR : regfile
 	port map(
 		clk => clk, 

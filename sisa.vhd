@@ -13,7 +13,7 @@ ENTITY sisa IS
           SRAM_OE_N : out   std_logic := '1';
           SRAM_WE_N : out   std_logic := '1';
 			 LEDG		  : out 	 std_logic_vector(7 downto 0);
-			 LEDR		  : out 	 std_logic_vector(7 downto 0);
+			 LEDR		  : out 	 std_logic_vector(9 downto 0);
           SW        : in std_logic_vector(9 downto 0);
 			 HEX0 	  : out std_logic_vector(6 downto 0);
 			 HEX1 	  : out std_logic_vector(6 downto 0);
@@ -113,7 +113,7 @@ component controladores_IO IS
 			wr_out : in std_logic;
 			rd_in : in std_logic;
 			led_verdes : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-			led_rojos : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			led_rojos : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
 			ps2_clk  : inout std_logic; 
 			ps2_data : inout std_logic;
 			display 	: out   STD_LOGIC_VECTOR(15 downto 0);

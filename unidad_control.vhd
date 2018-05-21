@@ -40,7 +40,13 @@ ENTITY unidad_control IS
 		invalid_instr : OUT STD_LOGIC;
 		excepr        : IN STD_LOGIC;
 		calls         : OUT STD_LOGIC;
-		instr_protected : OUT STD_LOGIC
+		instr_protected : OUT STD_LOGIC;
+		flush         : OUT STD_LOGIC;
+		wr_tlb_pi      : OUT STD_LOGIC;
+		wr_tlb_pd      : OUT STD_LOGIC;
+		wr_tlb_vi      : OUT STD_LOGIC;
+		wr_tlb_vd      : OUT STD_LOGIC;
+		estado_cpu : OUT std_logic_vector(1 downto 0)
 	);
 END unidad_control;
 
@@ -82,7 +88,12 @@ ARCHITECTURE Structure OF unidad_control IS
 			getiid        : OUT std_logic;
 			invalid_instr : OUT std_logic;
 			calls         : OUT STD_LOGIC;
-			instr_protected : OUT STD_LOGIC
+			instr_protected : OUT STD_LOGIC;
+			flush         : OUT STD_LOGIC;
+			wr_tlb_pi      : OUT STD_LOGIC;
+			wr_tlb_pd      : OUT STD_LOGIC;
+			wr_tlb_vi      : OUT STD_LOGIC;
+			wr_tlb_vd      : OUT STD_LOGIC
 		);
 	END COMPONENT;
  
@@ -113,7 +124,8 @@ ARCHITECTURE Structure OF unidad_control IS
 			intr       : IN std_logic;
 			state_word : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 			excepr     : IN STD_LOGIC;
-			calls 	   : IN STD_LOGIC
+			calls 	   : IN STD_LOGIC;
+			estado_cpu : OUT std_logic_vector(1 downto 0)
 		);
 	END COMPONENT;
 
@@ -160,7 +172,12 @@ BEGIN
 		inta          => inta_l_s, 
 		invalid_instr => invalid_instr, 
 		calls         => calls_s,
-		instr_protected => instr_protected
+		instr_protected => instr_protected,
+		flush         => flush,
+		wr_tlb_pi      => wr_tlb_pi,
+		wr_tlb_pd      => wr_tlb_pd,
+		wr_tlb_vi      => wr_tlb_vi,
+		wr_tlb_vd      => wr_tlb_vd
 	);
  
 	logicamulticiclo : multi
@@ -189,7 +206,8 @@ BEGIN
 		state_word => state_word, 
 		inta_l     => inta_l_s, 
 		excepr     => excepr,
-		calls	   => calls_s
+		calls	   => calls_s,
+		estado_cpu => estado_cpu
 	);
 	PROCESS (clk, boot, ldpc_signal, load_pc) BEGIN
 	IF boot = '1' THEN

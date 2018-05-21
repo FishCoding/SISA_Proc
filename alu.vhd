@@ -144,7 +144,7 @@ BEGIN
 	 
 	 with op(2) select
 		salida_mov <= movi_s when '0',
-						  movhi_s when others; --1
+					  movhi_s when others; --1
 			
 	 salida_branch <= y;
 	 
@@ -152,7 +152,7 @@ BEGIN
 	 
 	
 	 salida_jump <=  y when op(6 downto 1) = "101000" else 
-						  x + 2;-- when op(6 downto 2) = "10101";
+					 x + 2;-- when op(6 downto 2) = "10101";
 
 	 salida <= salida_mov when op(6 downto 3) = "0101" else
 				  salida_cmp when op(6 downto 3) = "0001" else

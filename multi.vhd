@@ -27,7 +27,8 @@ ENTITY multi IS
 		intr       : IN STD_LOGIC;
 		state_word : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 		excepr     : IN STD_LOGIC;
-		calls      : IN STD_LOGIC
+		calls      : IN STD_LOGIC;
+		estado_cpu : OUT std_logic_vector(1 downto 0)
 	);
 END multi;
 
@@ -55,6 +56,10 @@ BEGIN
 	END PROCESS;
 	
 	-- Cuando se detecta una excepcion mirar senales de escritura
+	estado_cpu <= "00" when estado_actual = FETCH else
+				  "01" when estado_actual = DEMBOW else
+				  "10" when estado_actual = SYSTEM else
+				  "11";
 
 	inta <= inta_l WHEN estado_actual = DEMBOW ELSE '0';
 	wr_m <= wr_m_l WHEN estado_actual = DEMBOW and excepr='0' ELSE '0';
