@@ -147,7 +147,7 @@ BEGIN
 	-- '0';
  
 	in_d <= "11" WHEN ir(15 DOWNTO 12) = "0111" OR (ir(15 DOWNTO 12) = x"F" AND ir(5 DOWNTO 0) = "101000") ELSE
-	        "10" WHEN ir(15 DOWNTO 12) = "1010" AND ir(2) = '1' ELSE
+	        "10" WHEN ir(15 DOWNTO 12) = "1010" AND ir(2 downto 0) = "100" ELSE
 	        "01" WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "1101" ELSE
 	        "00";
  

@@ -86,10 +86,10 @@ ARCHITECTURE Structure OF proc IS
 			boot             : IN STD_LOGIC;
 			state_word       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			invalid_division : OUT STD_LOGIC;
-			id_excep         : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-			value_data 	     : IN STD_LOGIC_VECTOR(15 downto 0);
+			id_excep         : IN STD_LOGIC_VECTOR(3 DOWNTO 0);	
 			a                : OUT STD_LOGIC_VECTOR(15 downto 0);
-			b                : OUT STD_LOGIC_VECTOR(15 downto 0)
+			b                : OUT STD_LOGIC_VECTOR(15 downto 0);
+			pc_fancy         : IN STD_LOGIC_VECTOR(15 downto 0)
 		);
  
 	END COMPONENT;
@@ -155,7 +155,7 @@ ARCHITECTURE Structure OF proc IS
 			calls             : IN STD_LOGIC;
 			state_word 		  : IN STD_LOGIC_VECTOR(15 downto 0);
 			instr_protected   : IN STD_LOGIC;
-			value_data 		  : OUT STD_LOGIC_VECTOR(15 downto 0);
+--			value_data 		  : OUT STD_LOGIC_VECTOR(15 downto 0);
 			system            : IN STD_LOGIC;
 			tlb_miss_inst     : IN STD_LOGIC;
 			tlb_miss_datos    : IN STD_LOGIC;
@@ -217,6 +217,8 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL state_word_s       : std_logic_vector(15 DOWNTO 0);
 
 	SIGNAL addr_m_s           : std_logic_vector(15 DOWNTO 0);
+
+
 	SIGNAL exception_value_s  : std_logic_vector(3 DOWNTO 0);
 	SIGNAL invalid_division_s : std_logic := '0';
 	SIGNAL invalid_instr_s    : std_logic := '0';
@@ -235,6 +237,8 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL wr_tlb_pi_s : std_logic;
 	SIGNAL wr_tlb_vd_s : std_logic;
 	SIGNAL wr_tlb_vi_s : std_logic;
+	
+	SIGNAL condicion_pc_fancy : std_logic;
 BEGIN
 	
 	flush_tlb_datos <= flush and reg_A(1);
@@ -285,8 +289,20 @@ BEGIN
 
 	intr_s <= intr;
 
-	pc_signal_fancy <= pc_signal - 2 when miss_tlb_inst = '1' or miss_tlb_datos = '1' else 
-					   pc_signal;
+	pc_signal_fancy <= pc_signal - 2 when  condicion_pc_fancy='1'  else 
+							pc_signal;
+							
+	process(clk)
+	begin 
+		if rising_edge(clk)then 
+			if (miss_tlb_datos = '1' and estado_cpu_s = "01" AND (op_signal(9 DOWNTO 6)= "0011" OR op_signal(9 DOWNTO 6) = "0100" OR op_signal(9 DOWNTO 6) = "1101" OR op_signal(9 DOWNTO 6) = "1110")) 
+														or (miss_tlb_inst='1' and estado_cpu_s = "00") then
+					condicion_pc_fancy <= '1' ;
+			else 
+					condicion_pc_fancy <= '0';
+			end if;
+		end if;
+	end process;
 
 	unidadcontrol0 : unidad_control
 	PORT MAP
@@ -348,7 +364,7 @@ BEGIN
 		immed_x2         => immed_x2_signal, 
 		datard_m         => datard_m, 
 		ins_dad          => ins_dad_signal, 
-		pc               => pc_signal_fancy, 
+		pc               => pc_signal, 
 		in_d             => in_d_signal, 
 		data_wr          => data_wr, 
 		addr_m           => addr_m_s, 
@@ -364,9 +380,9 @@ BEGIN
 		state_word       => state_word_s, 
 		invalid_division => invalid_division_s, 
 		id_excep         => exception_value_s,
-		value_data 		 => value_data_s,
 		a                => reg_A,
-		b                => reg_B
+		b                => reg_B,
+		pc_fancy         => pc_signal_fancy
 	);
 	
 	excep_controller : exception_controller
@@ -384,7 +400,7 @@ BEGIN
 		calls             => calls_s,
 		state_word 		  => state_word_s,
 		instr_protected   => instr_protected_s,
-		value_data 		  => value_data_s,
+--		value_data 		  => value_data_s,
 		system            => sys_s,
 		tlb_miss_inst     => miss_tlb_inst,
 		tlb_miss_datos    => miss_tlb_datos,

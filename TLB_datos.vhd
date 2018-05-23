@@ -30,7 +30,7 @@ ARCHITECTURE Structure OF TLB_datos IS
     signal fisico : Tabla_TLB_FISICO ;
     
     signal n_vir : std_logic_vector(7 downto 0);
-    signal codificador : std_logic_vector(3 downto 0);
+   signal codificador : std_logic_vector(3 downto 0);
     signal dir_f : std_logic_vector(5 downto 0);
     signal miss_signal : STD_LOGIC;
 
@@ -85,25 +85,25 @@ BEGIN
 
 	process(clk, boot)
      begin
-       
         if boot = '1' then
             virtual(0) <= "0000"; 
             virtual(1) <= "0000";
             virtual(2) <= "0000";
             virtual(3) <= "0000";
-            virtual(4) <= "0000";
-            virtual(5) <= "0000";
-            virtual(6) <= "0000";
-            virtual(7) <= "0000";
+            virtual(4) <= "1010";
+            virtual(5) <= "1011";
+            virtual(6) <= "0010";
+            virtual(7) <= "0011"; -- PILA SYS 
             
-            fisico(0) <= "000000"; 
+            fisico(0) <= "110000"; 
             fisico(1) <= "000000"; 
             fisico(2) <= "000000"; 
             fisico(3) <= "000000"; 
-            fisico(4) <= "000000"; 
-            fisico(5) <= "000000"; 
-            fisico(6) <= "000000"; 
-            fisico(7) <= "000000"; 
+            fisico(4) <= "101010"; 
+            fisico(5) <= "101011"; 
+            fisico(6) <= "100010"; 
+            fisico(7) <= "100011"; -- PILA SYSTEM 
+
         elsif rising_edge(clk) then
             if flush = '1' then
                 fisico(0)(5) <= '0'; 

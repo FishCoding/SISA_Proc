@@ -34,9 +34,9 @@ entity datapath is
 		state_word : out STD_LOGIC_VECTOR(15 downto 0);
 		invalid_division : out STD_LOGIC;
 		id_excep : IN STD_LOGIC_VECTOR(3 downto 0);
-		value_data 		  : IN STD_LOGIC_VECTOR(15 downto 0);
 		a : out std_logic_vector(15 downto 0);
-		b : out std_logic_vector(15 downto 0)
+		b : out std_logic_vector(15 downto 0);
+		pc_fancy  : IN STD_LOGIC_VECTOR(15 downto 0)
 	);
 end datapath;
 architecture Structure of datapath is
@@ -99,6 +99,9 @@ architecture Structure of datapath is
 	signal write_reg : std_logic_vector(15 downto 0);
 
 	signal a_reg  : std_logic_vector(15 downto 0);
+	signal addr_m_s : std_logic_vector(15 downto 0);
+	signal addr_m_fancy : std_logic_vector(15 downto 0);
+
 
 begin
 	with in_d select
@@ -124,9 +127,17 @@ begin
 	             immed(14 downto 0) & '0' when others;
  
 	with ins_dad select
-	addr_m <= pc when '0', 
+	addr_m_s <= pc when '0', 
 	          salida_alu when others;
  
+	process (clk) begin
+		if rising_edge(clk) then
+			addr_m_fancy <= addr_m_s;
+		end if;
+	end process;
+	
+	addr_m <= addr_m_s;
+	
 	with op(9 downto 6) select
 	Rb_N <= inmediato when "0010", 
 	        inmediato when "0011", 
@@ -176,14 +187,14 @@ begin
 		addr_d => addr_d, 
 		a => a_S, 
 		sys => sys, 
-		pc => pc, 
+		pc => pc_fancy, 
 		enable_int => enable_int, 
 		disable_int => disable_int, 
 		reti => reti, 
 		boot => boot, 
 		state_word => state_word,
 		id_excep => id_excep,
-		value_data => value_data
+		value_data => addr_m_fancy
 	);
  
  

@@ -19,7 +19,7 @@ ENTITY exception_controller IS
 		calls             : IN STD_LOGIC;
 		state_word        : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 		instr_protected   : IN STD_LOGIC;
-		value_data        : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+--		value_data        : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 		system            : IN STD_LOGIC;
 		tlb_miss_inst     : IN STD_LOGIC;
 		tlb_miss_datos    : IN STD_LOGIC;
@@ -35,7 +35,8 @@ ARCHITECTURE Structure OF exception_controller IS
 	SIGNAL illegal_mem_access_s : std_logic := '0';
 	SIGNAL addr_illegal         : std_logic_vector(15 DOWNTO 0);
 	SIGNAL exception_value_s    : std_logic_vector(3 DOWNTO 0);
-
+	
+	SIGNAL instr_protected_s    : std_logic;
 	SIGNAL tlb_miss_inst_s      : std_logic;
 	SIGNAL tlb_miss_datos_s     : std_logic;
 	SIGNAL tlb_invalid_inst_s   : std_logic;
@@ -49,17 +50,19 @@ BEGIN
 
 	-- illegal_mem_access_s <= '1' WHEN system = '0' and state_word(0) = '0' AND addr > x"C000" AND (op(9 DOWNTO 6) = x"3" OR op(9 DOWNTO 6) = x"4" or op(9 DOWNTO 6) = x"B" or op(9 DOWNTO 6) = x"C") ELSE '0'; -- region s.o
  
-	value_data          <= addr WHEN addr(1) = '1' AND byte_word = '1' AND (op(9 DOWNTO 6) = x"3" OR op(9 DOWNTO 6) = x"4");
+--	value_data          <= addr WHEN addr(1) = '1' AND byte_word = '1' AND (op(9 DOWNTO 6) = x"3" OR op(9 DOWNTO 6) = x"4") ELSE
+--								  "XXXXXXXXXXXXXXXX";
 
+	instr_protected_s <= instr_protected WHEN estado_cpu = "01" ELSE '0';
 	tlb_miss_inst_s     <= '1' WHEN tlb_miss_inst = '1' AND estado_cpu = "00" ELSE '0';
-	tlb_miss_datos_s    <= '1' WHEN tlb_miss_datos_s = '1' AND estado_cpu = "01" AND (op(9 DOWNTO 6)= x"3" OR op(9 DOWNTO 6) = x"4" OR op(9 DOWNTO 6) = x"D" OR op(9 DOWNTO 6) = x"E") ELSE '0';
+	tlb_miss_datos_s    <= '1' WHEN tlb_miss_datos = '1' AND estado_cpu = "01" AND (op(9 DOWNTO 6)= "0011" OR op(9 DOWNTO 6) = "0100" OR op(9 DOWNTO 6) = "1101" OR op(9 DOWNTO 6) = "1110") ELSE '0';
 	tlb_invalid_inst_s  <= '1' WHEN tlb_invalid_inst = '1' AND estado_cpu = "00" ELSE '0';
-	tlb_invalid_datos_s <= '1' WHEN tlb_invalid_datos = '1' AND estado_cpu = "01" AND (op(9 DOWNTO 6) = x"3" OR op(9 DOWNTO 6) = x"4" OR op(9 DOWNTO 6) = x"D" OR op(9 DOWNTO 6) = x"E") ELSE '0';
+	tlb_invalid_datos_s <= '1' WHEN tlb_invalid_datos = '1' AND estado_cpu = "01" AND (op(9 DOWNTO 6)= "0011" OR op(9 DOWNTO 6) = "0100" OR op(9 DOWNTO 6) = "1101" OR op(9 DOWNTO 6) = "1110") ELSE '0';
 	tlb_prot_inst_s     <= '1' WHEN estado_cpu = "00" AND state_word(0) = '0' AND addr > x"BFFF" ELSE '0';
-	tlb_prot_datos_s    <= '1' WHEN estado_cpu = "01" AND state_word(0) = '0' AND addr > x"BFFF" AND (op(9 DOWNTO 6) = x"3" OR op(9 DOWNTO 6) = x"4" OR op(9 DOWNTO 6) = x"D" OR op(9 DOWNTO 6) = x"E") ELSE '0';
-	tlb_lectura_datos_s <= '1' WHEN tlb_lectura_datos_s = '1' AND estado_cpu = "01" AND  (op(9 DOWNTO 6) = x"4" OR  op(9 DOWNTO 6) = x"E") ELSE '0';
+	tlb_prot_datos_s    <= '1' WHEN estado_cpu = "01" AND state_word(0) = '0' AND addr > x"BFFF" AND (op(9 DOWNTO 6)= "0011" OR op(9 DOWNTO 6) = "0100" OR op(9 DOWNTO 6) = "1101" OR op(9 DOWNTO 6) = "1110") ELSE '0';
+	tlb_lectura_datos_s <= '1' WHEN tlb_lectura_datos_s = '1' AND estado_cpu = "01" AND  (op(9 DOWNTO 6) = "0100" OR  op(9 DOWNTO 6) = "1110") ELSE '0';
  
-	excepr <= NOT(system) AND (calls OR illegal_mem_access_s OR instr_protected OR illegal_addr_s OR invalid_instr OR invalid_division OR 
+	excepr <= NOT(system) AND (calls OR illegal_mem_access_s OR instr_protected_s OR illegal_addr_s OR invalid_instr OR invalid_division OR 
 								tlb_miss_inst_s OR tlb_miss_datos_s OR tlb_invalid_inst_s OR tlb_invalid_datos_s OR tlb_prot_inst_s OR
 								tlb_prot_datos_s OR tlb_lectura_datos_s);-- calls_s or
 
@@ -73,7 +76,7 @@ BEGIN
 	                       x"A" WHEN tlb_prot_inst_s = '1' ELSE
 	                       x"B" WHEN tlb_prot_datos_s = '1' ELSE
 	                       x"C" WHEN tlb_lectura_datos_s = '1' ELSE
-	                       x"D" WHEN instr_protected = '1' ELSE
+	                       x"D" WHEN instr_protected_s = '1' ELSE
 	                       x"E" WHEN calls = '1' ELSE
 	                       x"F" WHEN intr = '1';
 

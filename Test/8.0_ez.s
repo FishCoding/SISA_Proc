@@ -45,61 +45,97 @@
         d_timer0_ticks:    .word 0
         d_timer_enable:    .word 0
         d_miss_tlb:        .word 0
-        d_calls            .word 0
+        d_calls:           .word 0
         
 
 .text
         
-        $MOVEI r0, 0x4
+        $MOVEI r0, 0x4; Imprimir por pantalla
         calls r0
-        $MOVEI r0, 0x5
-        calls r0
+        ;$MOVEI r0, 0x5 ; 
+        ;calls r0
         
-        
+        $MOVEI r1,0x7000
+        ld r1,0(r1)
         $MOVEI r1,0x5
         $MOVEI r0, 0x5
-        $PUSH r0,r1
-        $MOVEI r0, PILA
-        $MOVEI r1,0xA
-        calls r1
-
-        $POP r0,r1
-
-        
-
-        $MOVEI r1,0x5001
-        ld r1,0(r1)
+        ;$PUSH r0,r1
+        ;$MOVEI r1,0x6
+        ;calls r1
+		
+        ;$POP r0,r1
+	;$MOVEI r1, 0x5002
+	;st 0(r1),r1
 
         $MOVEI r0, 0x4
         calls r0
         
-        movi r6, 0            ;bucle infinito a la espera de que lleguen interrupciones
-        jmp    r6
+	$MOVEI r1, 0x0000
+	$MOVEI r3, 0x8002 
+for_main: 	
+	ld r2,0(r1)
+	addi r1,r1,0x2
+
+
+        $MOVEI r0, 0x4; Imprimir por pantalla
+        calls r0
+
+ 	cmpleu r2,r1,r3 
+	bnz r2, for_main	
+
+
+        ;movi r6, 0            ;bucle infinito a la espera de que lleguen interrupciones
+        ;jmp    r6
+        movi r0,0x7
+        calls r0
+        $MOVEI r1,_jmp
+        movi r0,0x4
+_jmp:  
+        calls r0
+
+        jmp r1
+
         halt
 
 .section data_system
+
+		sd_tlb_datos: .word 0
+		sd_tlb_instr: .word 0
 ; seccion de codigo
 .section system
 __entry:       ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
         ; Inicializacion
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-        $MOVEI r1, RSG
+        $MOVEI r1, RSG 
         wrs    s5, r1      ;inicializamos en S5 la direccion de la rutina de antencion a la interrupcion
         $MOVEI r7, PILA    ;inicializamos R7 como puntero a la pila
-        $MOVEI r6, inici   ;direccion de la rutina principal
-        jmp    r6
+		;movi r0, 0x2E
+		movi r1,0x2E
+		wrpd r1,r1 ; la entrada 6 de la tabla contiene el vtag E y el ptag E con bit de valido a 1 y read a 0
+		wrvd r1,r1 ; o sea, es lectura y escriptura
+		
+		movi r1, 0x32
+		wrpd r1, r1 ; la entrada 2 contiene el vtag 2 y el ptag 2 con el bit de valido y solo lectura a 1
+		wrvd r1, r1
+		;$MOVEI r0, 0x1000
+		;$MOVEI r1, sd_tlb_datos
+		;st 0(r1),r0 
+		;$MOVEI r0, 0xFFFF
+		;$MOVEI r1, sd_tlb_instr	
+		$MOVEI r6, inici   ;direccion de la rutina principal
+jmp:		jmp    r6
 
 
-__interrup_key:
-        in     r3, 7               ;leemos el valor de los pulsadores
-        not    r3,r3               ;los pulsadores son activos a '0'
-        movi   r4,0x0F
-        and    r3, r3, r4          ;mascara para apagar los leds que no corresponden a ningun pulsador
-        out     5, r3              ;activa los leds verdes con el valor de los pulsadores
-        $MOVEI r4, d_pulsadores    ;carga la direccion de memoria donde esta el dato sobre el estado de los pulsadores
-        st     0(r4), r3           ;actualiza la variable sobre el estado de los pulsadores
-        $MOVEI r6, end_excepcion         ;direccion del fin del servicio de interrupcion
-        jmp    r6
+		__interrup_key:
+				in     r3, 7               ;leemos el valor de los pulsadores
+				not    r3,r3               ;los pulsadores son activos a '0'
+				movi   r4,0x0F
+				and    r3, r3, r4          ;mascara para apagar los leds que no corresponden a ningun pulsador
+				out     5, r3              ;activa los leds verdes con el valor de los pulsadores
+				$MOVEI r4, d_pulsadores    ;carga la direccion de memoria donde esta el dato sobre el estado de los pulsadores
+				st     0(r4), r3           ;actualiza la variable sobre el estado de los pulsadores
+				$MOVEI r6, end_excepcion         ;direccion del fin del servicio de interrupcion
+				jmp    r6
 
 
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
@@ -146,7 +182,7 @@ RSG:    $PUSH r0, r1, r2, r3, r4, r5, r6 ;salvamos el estado en la pila; El r0 l
 	rds r1, s2
 	movi r2, 0
 	cmpeq r3, r1, r2
-	bnz r3, __excep_instr_ilegal 
+	bnz r3, __excep_instr_ilegal  
 	movi r2, 1
 	cmpeq r3, r1, r2
 	bnz r3, __excep_mem_align
@@ -155,24 +191,29 @@ RSG:    $PUSH r0, r1, r2, r3, r4, r5, r6 ;salvamos el estado en la pila; El r0 l
 	bnz r3, __excep_div0
         
         movi r2, 6 ; TLB_MISS INSTR
+	$MOVEI r4, __miss_routine_instr
 	cmpeq r3, r1, r2
-	bnz r3, __miss_routine 
+	jnz r3, r4 
         
         movi r2, 7 ; TLB_MIS DATOS
+	$MOVEI r4, __miss_routine_datos
 	cmpeq r3, r1, r2
-	bnz r3, __miss_routine 
+	jnz r3, r4
         
         movi r2, 8 ; TLB_INVALID INST
+	$MOVEI r4, __invalid_routine
 	cmpeq r3, r1, r2
-	bnz r3, end_exception 
+	jnz r3, r4
         
         movi r2, 9 ; TLB_INVALID DATOS
+        $MOVEI r4,__invalid_routine
 	cmpeq r3, r1, r2
-	bnz r3, end_excepcion 
+        
+	jnz r3, r4
         
         movi r2, 0xA; TLB_PROT INST
 	cmpeq r3, r1, r2
-	bnz r3, end_exception  
+	bnz r3, end_excepcion  
 
         movi r2, 0xB; TLB PROT DATOS
         cmpeq r3, r1, r2
@@ -180,7 +221,7 @@ RSG:    $PUSH r0, r1, r2, r3, r4, r5, r6 ;salvamos el estado en la pila; El r0 l
         
         movi r2, 0xC ; TLB_LECTURA DATOS
 	cmpeq r3, r1, r2
-	bnz r3, __excep_interrupt 
+	bnz r3, end_excepcion 
 
         movi r2, 0xD ; INSTR PROTECTED
         cmpeq r3, r1, r2
@@ -267,23 +308,31 @@ __excep_protec:
 __flush_routine: 
         $MOVEI r1,0x2
         flush r1
-        $MOVEI r6,end_exception
+        $MOVEI r6,end_excepcion
         jmp r6
 
 __calls_routine:
+
+        $MOVEI r4, d_calls
+        ld     r3, 0(r4)
+        addi   r3, r3, 1           ;d_ticks_seg++
+        st     0(r4), r3
+
 	rds r2,s3
 
         $MOVEI r1, 0x4
-        cmpeq r2,r1,r2
-        bnz r2,binf
+        $MOVEI r3, binf
+	cmpeq r2,r1,r2
+        jnz r2, r3
         
         $MOVEI r1, 0x5
         cmpeq r2,r1,r2
         bnz r2,__timer_rutine
     
         $MOVEI r1, 0x6
-        cmpeq r2,r1,r2
-        bnz r2,__map_allocate
+        $MOVEI r3, __map_allocate
+		cmpeq r2,r1,r2
+        jnz r2, r3
 
         $MOVEI r1, 0x7
         cmpeq r2,r1,r2
@@ -393,12 +442,13 @@ __interrup_timer:
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 __disable_system: 
-        rds    r0,s7
-        $MOVEI r1, 0xFFFE
-        and r1,r0,r1
-        wrs    s7,r1
-        $MOVEI r1,0x0000
-        jmp r1
+        rds r1, s7
+        $MOVEI r0, 0xFFFE
+        and r1, r1, r0
+        wrs s0, r1
+        movi r1, 0
+        wrs  s1,r1
+        reti
 
 
         ; *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
@@ -416,6 +466,21 @@ inici:
         ei                         ;activa las interrupciones
         $CALL r6, __disable_system
 
+
+__invalid_routine:
+        rds r1,s1
+        addi r1,r1,-2
+        wrs s1,r1
+
+        $MOVEI r4, d_miss_tlb
+        ld     r3, 0(r4)
+        addi   r3, r3, 1           ;d_ticks_seg++
+        st     0(r4), r3
+
+	$MOVEI r6, end_excepcion         ;direccion del fin del servicio de excepcion
+        jmp    r6
+
+
 binf:   
         $MOVEI r1, 0xA000          ;fila 0; columna 0
         $MOVEI r2, frase0a         ;frase 0a
@@ -425,8 +490,6 @@ binf:
         ld     r2, 0(r2)           ;carga el numero de ticks
         $CALL  r6, __write_valor
 
-	
-	
         $MOVEI r1, 0xA032          ;fila 0; columna 25
         $MOVEI r2, frase0b         ;frase 0b
         $CALL  r6, __write_line
@@ -648,24 +711,51 @@ fin_bcad_seg:
 __map_allocate: 
 ;r0 la direccion de la pila
 
-        ld r1, 0(r7) ;timer_ticks
-        ld r2 1(r7);
-        wrpi r1
-        wrvi r2
+        ;ld r1, 0(r7) ;timer_ticks
+        ;ld r2, 1(r7);
+        ;wrpd r1
+        ;wrvd r2
 
-        $MOVEI r1, end_exception 
+        $MOVEI r1, end_excepcion 
         jmp r1;
 
-
-
-
-
-__miss_routine:
+__miss_routine_datos:
         $MOVEI r4, d_miss_tlb
         ld     r3, 0(r4)
         addi   r3, r3, 1         
         st     0(r4), r3
-        $MOVEI r4,end_exception 
+        
+	rds r3,s3 
+	$MOVEI r4,0xF4
+	shl r3,r3,r4
+	out 6,r3
+        movi r4, 1
+	wrvd r4, r3
+	movi r3, 0x33
+	wrpd r4, r3
+		
+		$MOVEI r4,end_excepcion 
+        jmp r4
+
+__miss_routine_instr:
+        ;$MOVEI r4, d_miss_tlb
+        ;ld     r3, 0(r4)
+        ;addi   r3, r3, 1         
+        ;st     0(r4), r3
+        
+		;rds s3,r3 
+		;$MOVEI r4,12
+		;srl r3,r3,r4
+		
+		;wrpi r3 
+		;wrvi r3 
+		
+		in r3, 6
+        movi r1, 64
+        or r3,r1,r3
+        out   6, r3                ;activa los leds rojos 1
+
+		$MOVEI r4,end_excepcion 
         jmp r4
 
 
@@ -819,5 +909,6 @@ __condfor2:
         ld        r5, 2(r7)
         addi      r7, r7, 4
         jmp       r5
+
 
 

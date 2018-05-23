@@ -145,6 +145,7 @@ if (open(FICHERO_IN, "$FICHERO_origen")) {
                 limpiar_tipofuente_codigo() if (lc($tipo_fuente) eq "codigo");
                 limpiar_tipofuente_datos()  if (lc($tipo_fuente) eq "datos");
                 limpiar_tipofuente_system()  if (lc($tipo_fuente) eq "system");
+                limpiar_tipofuente_datos()  if (lc($tipo_fuente) eq "data_system");
 
             } else {
                 printf STDERR "%sERROR:%s No se ha podido abrir el fichero de salida %s${FICHERO_SALIDA_DE2}%s para escritura\n",color("bold red on_white"),color("reset"),color("bold"),color("reset");

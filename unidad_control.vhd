@@ -212,7 +212,7 @@ BEGIN
 	PROCESS (clk, boot, ldpc_signal, load_pc) BEGIN
 	IF boot = '1' THEN
 		pc_signal <= X"C000";
-		ir_signal <= X"0000";
+		ir_signal <= X"0001";
 	ELSIF rising_edge(clk) THEN
 		IF ldir_signal = '1' THEN
 			ir_signal <= datard_m;
