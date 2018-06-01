@@ -14,7 +14,6 @@ ENTITY regfile IS
 			 b      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
 END regfile;
 
-
 ARCHITECTURE Structure OF regfile IS
 	type Banco_Registros is array (7 downto 0) of std_logic_vector(15 downto 0);
 	signal BR : Banco_Registros ;
