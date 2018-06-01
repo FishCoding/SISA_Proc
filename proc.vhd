@@ -61,9 +61,10 @@ ARCHITECTURE Structure OF proc IS
 		(
 			clk              : IN STD_LOGIC;
 			op               : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
-			wrd              : IN STD_LOGIC;
+		   wrd_gp_int 		  : IN STD_LOGIC;
+		   wrd_gp_fp        : IN STD_LOGIC;
 			d_sys            : IN STD_LOGIC;
-			a_sys            : IN STD_LOGIC;
+			sel_br           : IN STD_LOGIC_VECTOR (1 DOWNTO 0);
 			addr_a           : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d           : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
 			immed            : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -77,7 +78,7 @@ ARCHITECTURE Structure OF proc IS
 			addr_m           : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			jump_addr        : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			tknbr            : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-			rd_io            : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+			rd_io            : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			wr_io            : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			sys              : IN STD_LOGIC;
 			enable_int       : IN STD_LOGIC;

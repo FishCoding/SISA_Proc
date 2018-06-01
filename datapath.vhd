@@ -6,9 +6,10 @@ entity datapath is
 	port (
 		clk : in STD_LOGIC;
 		op : in STD_LOGIC_VECTOR(9 downto 0);
-		wrd : in STD_LOGIC;
+		wrd_gp_int : in STD_LOGIC;
+		wrd_gp_fp  : in STD_LOGIC;
 		d_sys : in STD_LOGIC;
-		a_sys : in STD_LOGIC;
+		sel_br : in STD_LOGIC_VECTOR(1 downto 0);
 		addr_a : in STD_LOGIC_VECTOR(2 downto 0);
 		addr_d : in STD_LOGIC_VECTOR(2 downto 0);
 		immed : in STD_LOGIC_VECTOR(15 downto 0);
@@ -94,7 +95,9 @@ architecture Structure of datapath is
 	signal Rb_N : std_logic_vector(15 downto 0);
 	signal reg_b : std_logic_vector (15 downto 0);
 	signal a_S : std_logic_vector(15 downto 0);
-	signal a_R : std_logic_vector(15 downto 0);
+	signal a_GP_INT : std_logic_vector(15 downto 0);
+	signal a_GP_FP  : std_logic_vector(15 downto 0);
+
  
 	signal write_reg : std_logic_vector(15 downto 0);
 
@@ -106,21 +109,17 @@ architecture Structure of datapath is
 begin
 	with in_d select
 	a_escribir <= salida_alu when "00", 
-	              datard_m when "01", 
+	              datard_m 	 when "01", 	
 	              std_logic_vector(unsigned(pc) + 2) when "10", 
-	              rd_io when others;
+	              rd_io      when others;
  
-	
-
 	process(clk,boot) begin
 		if rising_edge(clk) then	
 			a_reg <= a_leer;		
 		end if;
 	end process;
 
-	write_reg <= a_reg when sys= '1' else a_escribir;--a_S when op(9 downto 0) = "1111101100" else
-	--a_R when op(9 downto 0) = "1111110000" else
-	--a_escribir;
+	write_reg <= a_reg when sys= '1' else a_escribir; -- Cosas del SYS
  
 	with immed_x2 select
 	inmediato <= immed when '0', 
@@ -138,7 +137,7 @@ begin
 	
 	addr_m <= addr_m_s;
 	
-	with op(9 downto 6) select
+	with op(9 downto 6) select -- Immediato que va a la ALU
 	Rb_N <= inmediato when "0010", 
 	        inmediato when "0011", 
 	        inmediato when "0100", 
@@ -146,9 +145,7 @@ begin
 	        inmediato when "1110", 
 	        inmediato when "0101", 
 	        reg_b when others;
- 
- 
- 
+
 	jump_addr <= a_leer;
  
 	data_wr <= reg_b;
@@ -166,18 +163,30 @@ begin
 	a <= a_R;
 	b <= reg_b;
 	
-	regR : regfile
+	regGeneralPurposeINT : regfile
 	port map(
 		clk => clk, 
-		wrd => wrd, 
+		wrd => wrd_gp_int, 
 		d => a_escribir, 
 		addr_a => addr_a, 
 		addr_d => addr_d, 
-		a => a_R, 
+		a => a_GP_INT, 
 		addr_b => addr_b, 
 		b => reg_b
 	);
- 
+	
+	regGeneralPurposeFP : regfile
+	port map (
+		clk => clk,
+		wrd => wrd_gp_fp,
+		d	 => a_escribir,
+		addr_a => addr_a,
+		addr_d => addr_d,
+		a => a_GP_FP,
+		addr_b => addr_b,
+		b => reg_b
+	);
+	
 	regS : system_regfile
 	port map(
 		clk => clk, 
@@ -197,14 +206,14 @@ begin
 		value_data => addr_m_fancy
 	);
  
- 
-	with a_sys select -- wrs rds
-	a_leer <= a_S when '1', 
-	          a_R when others;
+	with sel_br select -- Permite seleccionar el banco de registros del cual se lee el puerto A
+	a_leer <= a_GP_INT  	when "00",
+				 a_S			when "01",  
+	          a_GP_FP 	when others; -- 10, 11 ...
  
 	alu0 : alu
 	port map(
-		x => a_leer, 
+		x => a_leer, -- Ahora puede ser de INT, FP o SYS
 		y => Rb_N, 
 		op => op(9 downto 3), 
 		z => z_s, 
