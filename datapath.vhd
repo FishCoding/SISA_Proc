@@ -51,6 +51,17 @@ architecture Structure of datapath is
 			invalid_division : out STD_LOGIC
 		);
 	end component;
+	
+	component alu_fp is
+		port (
+			 x  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0); 
+          y  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0); 
+          op : IN  STD_LOGIC_VECTOR(6 DOWNTO 0); 
+          w  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			 invalid_division : OUT STD_LOGIC;
+			 overflow : OUT STD_LOGIC
+			 ); 
+	end component;
  
 	component regfile is
 		port (
@@ -212,5 +223,14 @@ begin
 		invalid_division => invalid_division
 	);
  
- 
+   aluFP : alu_fp
+	port map(
+		x  => 
+      y  => 
+      op => op(9 downto 3),
+      w  =>
+		invalid_division =>
+		overflow =>
+	); 
+   
 end Structure;
