@@ -9,14 +9,15 @@ ENTITY control_l IS
 		state_word 	  : IN STD_LOGIC_VECTOR(15 downto 0);
 		op            : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
 		ldpc          : OUT STD_LOGIC;
-		wrd           : OUT STD_LOGIC;
+		wrd_gp_int    : OUT STD_LOGIC; --permis escriptura BRint
+		wrd_gp_fp     : OUT STD_LOGIC; --permis escriptura BRfp
  
 		addr_a        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 		addr_b        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 		addr_d        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 		immed         : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		wr_m          : OUT STD_LOGIC;
-		in_d          : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+		wr_m          : OUT STD_LOGIC; --permis escriptura memoria
+		in_d          : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica quina es la dada a escriure en BR (PC, ALU o MEM, IN respectivament)
 		immed_x2      : OUT STD_LOGIC;
 		word_byte     : OUT STD_LOGIC;
 		addr_io       : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -24,8 +25,8 @@ ENTITY control_l IS
 		wr_out        : OUT STD_LOGIC;
 		low_ir        : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
  
-		d_sys         : OUT STD_LOGIC;
-		a_sys         : OUT STD_LOGIC;
+		d_sys         : OUT STD_LOGIC; --permis escriptura sysBR
+		sel_br        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
 		enable_int    : OUT STD_LOGIC;
 		disable_int   : OUT STD_LOGIC;
 		reti          : OUT STD_LOGIC;
@@ -58,8 +59,8 @@ BEGIN
 	invalid_instr <= '1' WHEN (ir(15 DOWNTO 12) = "1010" AND (ir(5 DOWNTO 3) /= "000" OR ir(2 DOWNTO 0) = "010" OR ir(2 DOWNTO 0) = "101" OR ir(2 DOWNTO 0) = "110")) OR -- Jumps
 	                 (ir(15 DOWNTO 12) = "0001" AND (ir(5 DOWNTO 3) = "010" OR ir(5 DOWNTO 3) = "110" OR ir(5 DOWNTO 3) = "111")) OR -- Compare Instructions
 	                 (ir(15 DOWNTO 12) = "1000" AND (ir(5 DOWNTO 3) = "011" OR ir(5 DOWNTO 3) = "110" OR ir(5 DOWNTO 3) = "111")) OR -- Multiplicacion Division
-	                 (ir(15 DOWNTO 12) = "1001") OR -- Floats
-	                 ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" OR -- Load Store Floats
+--	                 (ir(15 DOWNTO 12) = "1001") OR -- Floats
+--	                 ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" OR -- Load Store Floats
 					 (ir(15 DOWNTO 12) = "1111" AND (ir(5) = '0' OR (ir(4 DOWNTO 0) /= "00000" AND ir(4 DOWNTO 0) /= "00001" 
 							 AND ir(4 DOWNTO 0) /= "00100" AND ir(4 DOWNTO 0) /= "01000" AND ir(4 DOWNTO 0) /= "01100" 
 							 AND ir(4 DOWNTO 0) /= "10000"  AND ir(4 DOWNTO 0) /= "10100" AND ir(4 DOWNTO 0) /= "10101" 
@@ -96,10 +97,14 @@ BEGIN
  
 	addr_io <= ir(7 DOWNTO 0);
  
-	wrd     <= '0' WHEN (ir(15 DOWNTO 12) = "1111" AND ir(4 DOWNTO 0) /= "01100" AND ir(4 DOWNTO 0) /= "01000")OR ir(15 DOWNTO 12) = "0100" 
+	wrd_gp_int <= '0' WHEN (ir(15 DOWNTO 12) = "1111" AND ir(4 DOWNTO 0) /= "01100" AND ir(4 DOWNTO 0) /= "01000") OR ir(15 DOWNTO 12) = "0100" 
 						OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0110" OR operation(9 DOWNTO 5) = "10100" 
 						OR operation(9 DOWNTO 5) = "01111" ELSE
 	     	   '1';
+				
+	wrd_gp_fp <= '1' WHEN ir(15 DOWNTO 12) = "1001" OR ir(15 DOWNTO 12) = "1011" ELSE --OP/CMP FP or LDF
+					 '0';
+	
 	d_sys <= '1' WHEN ir(15 DOWNTO 12) = "1111" AND ir(5 DOWNTO 0) = "110000" ELSE
 	         '0';
 
@@ -119,7 +124,7 @@ BEGIN
  
 	addr_b <= ir(11 DOWNTO 9) WHEN ir(15 DOWNTO 12) = "0100" OR ir(15 DOWNTO 12) = "0110" OR ir(15 DOWNTO 12) = "0111" 
 					OR ir(15 DOWNTO 12) = "1010" OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0111" 
-					OR ir(15 DOWNTO 12) = "1111" ELSE
+					OR ir(15 DOWNTO 12) = "1111" OR ir(15 DOWNTO 12) = "1100" ELSE
 			  ir(2 DOWNTO 0);
  
 	addr_d <= ir(11 DOWNTO 9);
@@ -135,31 +140,30 @@ BEGIN
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1101", 
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1110", 
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "0011", 
-	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "0100", 
+	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "0100",
+				std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1011", --LDF
+				std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1100", --STF
 	         std_logic_vector(resize(signed(ir(7 DOWNTO 0)), immed'length)) WHEN OTHERS;
  
  
 	WITH ir(15 DOWNTO 12) SELECT
-	wr_m <= '1' WHEN "0100", 
-	        '1' WHEN "1110", 
+	wr_m <= '1' WHEN "0100", --ST
+	        '1' WHEN "1110", --STB
+			  '1' WHEN "1100", --STF
 	        '0' WHEN OTHERS;
-	--wr_m <= '1' when ir(15 downto 12)="0100" or ir(15 downto 12)="1110" else
-	-- '0';
  
-	in_d <= "11" WHEN ir(15 DOWNTO 12) = "0111" OR (ir(15 DOWNTO 12) = x"F" AND ir(5 DOWNTO 0) = "101000") ELSE
-	        "10" WHEN ir(15 DOWNTO 12) = "1010" AND ir(2 downto 0) = "100" ELSE
-	        "01" WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "1101" ELSE
-	        "00";
+	in_d <= "11" WHEN ir(15 DOWNTO 12) = "0111" OR (ir(15 DOWNTO 12) = x"F" AND ir(5 DOWNTO 0) = "101000") ELSE --IN or GETTID
+	        "10" WHEN ir(15 DOWNTO 12) = "1010" AND ir(2 downto 0) = "100" ELSE --PC
+	        "01" WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "1101" ELSE --MEM
+	        "00"; --ALU
  
 	immed_x2 <= '1' WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "0100" ELSE
 	            '0';
  
 	WITH ir(15 DOWNTO 12) SELECT
-	word_byte <= '1' WHEN "1101", 
-	             '1' WHEN "1110", 
+	word_byte <= '1' WHEN "1101", --LDB
+	             '1' WHEN "1110", --STB
 	             '0' WHEN OTHERS;
-	--word_byte <= '1' when ir(15 downto 12)="1101" or ir(15 downto 12)="1110" else
-	-- '0';
  
 	op <= operation;
 END Structure;
