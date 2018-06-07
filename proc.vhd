@@ -102,7 +102,8 @@ ARCHITECTURE Structure OF proc IS
 			clk             : IN STD_LOGIC;
 			datard_m        : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 			op              : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
-			wrd             : OUT STD_LOGIC;
+			wrd_gp_int    	 : OUT STD_LOGIC; --permis escriptura BRint
+			wrd_gp_fp     	 : OUT STD_LOGIC; --permis escriptura BRfp
 			addr_a          : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b          : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d          : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -118,8 +119,9 @@ ARCHITECTURE Structure OF proc IS
 			addr_io         : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			rd_in           : OUT STD_LOGIC;
 			wr_out          : OUT STD_LOGIC;
-			d_sys           : OUT STD_LOGIC;
-			a_sys           : OUT STD_LOGIC;
+			d_sys           : OUT STD_LOGIC; --permis escriptura sysBR
+			sel_br          : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
+			b_br			    : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
 			sys             : OUT STD_LOGIC;
 			enable_int      : OUT STD_LOGIC;
 			disable_int     : OUT STD_LOGIC;
@@ -206,8 +208,9 @@ ARCHITECTURE Structure OF proc IS
  
 	SIGNAL jump_addr_s        : std_logic_vector(15 DOWNTO 0);
  
-	SIGNAL a_sys_s            : std_logic;
+	SIGNAL sel_br_s           : std_logic;
 	SIGNAL d_sys_s            : std_logic;
+	SIGNAL b_br_s             : std_logic;
 	SIGNAL sys_s              : std_logic;
  
 	SIGNAL enable_int_s       : std_logic;
@@ -313,8 +316,9 @@ BEGIN
 		datard_m      => datard_m, 
 		op            => op_signal, 
 		wrd           => wrd_signal, 
-		a_sys         => a_sys_s, 
+		sel_br        => sel_br_s, 
 		d_sys         => d_sys_s, 
+		b_br 			  => b_br_s,
 		addr_a        => addr_a_signal, 
 		addr_d        => addr_d_signal, 
 		addr_b        => addr_b_signal, 
@@ -356,7 +360,7 @@ BEGIN
 		clk              => clk, 
 		op               => op_signal, 
 		wrd              => wrd_signal, 
-		a_sys            => a_sys_s, 
+		sel_br           => sel_br_s, 
 		d_sys            => d_sys_s, 
 		addr_a           => addr_a_signal, 
 		addr_d           => addr_d_signal, 

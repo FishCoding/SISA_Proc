@@ -10,16 +10,17 @@ ENTITY unidad_control IS
 		clk           : IN STD_LOGIC;
 		datard_m      : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 		op            : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
-		wrd           : OUT STD_LOGIC;
+		wrd_gp_int    : OUT STD_LOGIC; --permis escriptura BRint
+		wrd_gp_fp     : OUT STD_LOGIC; --permis escriptura BRfp
 		addr_a        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 		addr_b        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 		addr_d        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 		immed         : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 		pc            : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 		ins_dad       : OUT STD_LOGIC;
-		in_d          : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+		in_d          : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica quina es la dada a escriure en BR (PC, ALU o MEM, IN respectivament)
 		immed_x2      : OUT STD_LOGIC;
-		wr_m          : OUT STD_LOGIC;
+		wr_m          : OUT STD_LOGIC; --permis escriptura memoria
 		word_byte     : OUT STD_LOGIC;
 		jump_addr     : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 		tknbr         : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -27,8 +28,9 @@ ENTITY unidad_control IS
 		rd_in         : OUT STD_LOGIC;
 		wr_out        : OUT STD_LOGIC;
  
-		a_sys         : OUT STD_LOGIC;
-		d_sys         : OUT STD_LOGIC;
+		sel_br        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
+		d_sys         : OUT STD_LOGIC; --permis escriptura sysBR
+		b_br			  : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
 		sys           : OUT STD_LOGIC;
 		enable_int    : OUT STD_LOGIC;
 		disable_int   : OUT STD_LOGIC;
@@ -65,7 +67,9 @@ ARCHITECTURE Structure OF unidad_control IS
 			state_word 	  : IN STD_LOGIC_VECTOR(15 downto 0);
 			op            : OUT STD_LOGIC_VECTOR(9 DOWNTO 0);
 			ldpc          : OUT STD_LOGIC;
-			wrd           : OUT STD_LOGIC;
+			wrd_gp_int    : OUT STD_LOGIC; --permis escriptura BRint
+			wrd_gp_fp     : OUT STD_LOGIC; --permis escriptura BRfp
+			
 			addr_a        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_b        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -79,8 +83,9 @@ ARCHITECTURE Structure OF unidad_control IS
 			wr_out        : OUT STD_LOGIC;
 			low_ir        : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
 
-			d_sys         : OUT STD_LOGIC;
-			a_sys         : OUT STD_LOGIC;
+			d_sys         : OUT STD_LOGIC; --permis escriptura sysBR
+			sel_br        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
+			b_br			  : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
 			enable_int    : OUT STD_LOGIC;
 			disable_int   : OUT STD_LOGIC;
 			reti          : OUT STD_LOGIC;
@@ -103,19 +108,21 @@ ARCHITECTURE Structure OF unidad_control IS
 			clk       : IN STD_LOGIC;
 			boot      : IN STD_LOGIC;
 			ldpc_l    : IN STD_LOGIC;
-			wrd_l     : IN STD_LOGIC;
-			a_sys_l   : IN STD_LOGIC;
+			wrd_gp_int_l : IN STD_LOGIC;
+			wrd_gp_fp_l : IN STD_LOGIC;
+			sel_br_l   : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
 			d_sys_l   : IN STD_LOGIC;
 			wr_m_l    : IN STD_LOGIC;
 			w_b       : IN STD_LOGIC;
 			ldpc      : OUT STD_LOGIC;
-			wrd       : OUT STD_LOGIC;
+			wrd_gp_int : OUT STD_LOGIC;
+			wrd_gp_fp : OUT STD_LOGIC;
 			wr_m      : OUT STD_LOGIC;
 			ldir      : OUT STD_LOGIC;
 			ins_dad   : OUT STD_LOGIC;
 			word_byte : OUT STD_LOGIC;
 			--Interrupciones
-			a_sys      : OUT STD_LOGIC;
+			sel_br     : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 			d_sys      : OUT STD_LOGIC;
  
 			sys        : OUT STD_LOGIC;
@@ -133,11 +140,12 @@ ARCHITECTURE Structure OF unidad_control IS
 	SIGNAL pc_signal        : std_logic_vector(15 DOWNTO 0) := X"C000";
 	SIGNAL word_byte_signal : std_logic;
 	SIGNAL wr_m_signal      : std_logic;
-	SIGNAL wrd_signal       : std_logic;
+	SIGNAL wrd_gp_int_signal : std_logic;
+	SIGNAL wrd_gp_fp_signal : std_logic;
 	SIGNAL ldpc_signal      : std_logic;
 	SIGNAL ldir_signal      : std_logic;
 
-	SIGNAL a_sys_s          : std_logic;
+	SIGNAL sel_br_s          : std_logic_vector(1 DOWNTO 0);
 	SIGNAL d_sys_s          : std_logic;
 
 	SIGNAL op_s             : std_logic_vector(9 DOWNTO 0);
@@ -151,9 +159,11 @@ BEGIN
 		state_word 	  => state_word,
 		op            => op_s, 
 		ldpc          => ldpc_signal, 
-		wrd           => wrd_signal, 
-		a_sys         => a_sys_s, 
+		wrd_gp_int    => wrd_gp_int_signal,
+		wrd_gp_fp     => wrd_gp_fp_signal,
+		sel_br         => sel_br_s, 
 		d_sys         => d_sys_s, 
+		b_br =>		  => b_br,
 		addr_a        => addr_a, 
 		addr_b        => addr_b, 
 		addr_d        => addr_d, 
@@ -186,19 +196,21 @@ BEGIN
 		clk       => clk, 
 		boot      => boot, 
 		ldpc_l    => ldpc_signal, 
-		wrd_l     => wrd_signal, 
-		a_sys_l   => a_sys_s, 
+		wrd_gp_int_l => wrd_gp_int_signal,
+		wrd_gp_fp_l  => wrd_gp_fp_signal,	
+		sel_br_l   => sel_br_s, 
 		d_sys_l   => d_sys_s, 
 		wr_m_l    => wr_m_signal, 
 		w_b       => word_byte_signal, 
 		ldpc      => load_pc, 
-		wrd       => wrd, 
+		wrd_gp_int => wrd_gp_int,
+		wrd_gp_fp  => wrd_gp_fp, 
 		wr_m      => wr_m, --Cambiado
 		ldir      => ldir_signal, 
 		ins_dad   => ins_dad, 
 		word_byte => word_byte, 
 		-- Interrupciones
-		a_sys      => a_sys, 
+		sel_br     => sel_br, 
 		d_sys      => d_sys, 
 		sys        => sys_s, 
 		intr       => intr, 

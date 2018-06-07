@@ -7,27 +7,30 @@ ENTITY multi IS
 		clk       : IN STD_LOGIC;
 		boot      : IN STD_LOGIC;
 		ldpc_l    : IN STD_LOGIC;
-		wrd_l     : IN STD_LOGIC;
-		a_sys_l   : IN STD_LOGIC;
+		wrd_gp_int_l : IN STD_LOGIC;
+		wrd_gp_fp_l : IN STD_LOGIC;
+		sel_br_l   : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
 		d_sys_l   : IN STD_LOGIC;
 		wr_m_l    : IN STD_LOGIC;
 		w_b       : IN STD_LOGIC;
 		ldpc      : OUT STD_LOGIC;
-		wrd       : OUT STD_LOGIC;
+		wrd_gp_int : OUT STD_LOGIC;
+		wrd_gp_fp : OUT STD_LOGIC;
 		wr_m      : OUT STD_LOGIC;
 		ldir      : OUT STD_LOGIC;
 		ins_dad   : OUT STD_LOGIC;
 		word_byte : OUT STD_LOGIC;
-		-- Interrupciones
-		a_sys      : OUT STD_LOGIC;
+		--Interrupciones
+		sel_br      : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 		d_sys      : OUT STD_LOGIC;
+ 
 		sys        : OUT STD_LOGIC;
-		inta_l     : IN STD_LOGIC;
+		inta_l     : IN std_logic;
 		inta       : OUT std_logic;
-		intr       : IN STD_LOGIC;
+		intr       : IN std_logic;
 		state_word : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 		excepr     : IN STD_LOGIC;
-		calls      : IN STD_LOGIC;
+		calls 	   : IN STD_LOGIC;
 		estado_cpu : OUT std_logic_vector(1 downto 0)
 	);
 END multi;
@@ -67,7 +70,8 @@ BEGIN
 	ldpc <= ldpc_l WHEN estado_actual = DEMBOW ELSE
 	        '1' WHEN estado_actual = SYSTEM ELSE
 	        '0'; -- Load PC
-	wrd       <= wrd_l WHEN estado_actual = DEMBOW and excepr='0' ELSE '0';
+	wrd_gp_int <= wrd_gp_int_l WHEN estado_actual = DEMBOW and excepr='0' ELSE '0';
+	wrd_gp_fp  <= wrd_gp_fp_l WHEN estado_actual = DEMBOW and excepr='0' ELSE '0';
 	word_byte <= w_b WHEN estado_actual = DEMBOW ELSE '0';
 	ins_dad   <= '1' WHEN estado_actual = DEMBOW ELSE '0';
 	ldir      <= '1' WHEN estado_actual = FETCH ELSE '0';

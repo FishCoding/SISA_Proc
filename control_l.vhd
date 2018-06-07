@@ -27,6 +27,7 @@ ENTITY control_l IS
  
 		d_sys         : OUT STD_LOGIC; --permis escriptura sysBR
 		sel_br        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
+		b_br			  : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
 		enable_int    : OUT STD_LOGIC;
 		disable_int   : OUT STD_LOGIC;
 		reti          : OUT STD_LOGIC;
@@ -107,9 +108,16 @@ BEGIN
 	
 	d_sys <= '1' WHEN ir(15 DOWNTO 12) = "1111" AND ir(5 DOWNTO 0) = "110000" ELSE
 	         '0';
-
-	a_sys <= '1' WHEN ir(15 DOWNTO 12) = "1111" AND (ir(5 DOWNTO 0) = "101100" OR ir(5 DOWNTO 0) = "100100") ELSE
-	         '0';
+	
+	sel_br <= "10" WHEN ir(15 DOWNTO 12) = "1001" ELSE --BRfp
+				 "01" WHEN ir(15 DOWNTO 12) = "1111" AND (ir(5 DOWNTO 0) = "101100" OR ir(5 DOWNTO 0) = "100100") ELSE --BRsys
+				 "00"; --BRint
+				 
+	b_br <= '1' WHEN ir(15 DOWNTO 12) = "1001" OR ir(15 DOWNTO 12) = "1100" ELSE --OP/CMP FP or STF
+			  '0';
+				 
+--	a_sys <= '1' WHEN ir(15 DOWNTO 12) = "1111" AND (ir(5 DOWNTO 0) = "101100" OR ir(5 DOWNTO 0) = "100100") ELSE
+--	         '0';
  
 	reti        <= '1' WHEN ir(15 DOWNTO 0) = x"F024" ELSE '0';
  
