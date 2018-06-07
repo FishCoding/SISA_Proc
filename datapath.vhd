@@ -219,7 +219,7 @@ begin
  
 	with sel_br select -- Permite seleccionar el banco de registros del cual se lee el puerto A
 	a_leer <= a_GP_INT  	when "00",
-				 a_S			when "01",  
+			  a_S			when "01",  
 	          a_GP_FP 	when others; -- 10, 11 ...
  
 	alu0 : alu
@@ -235,9 +235,9 @@ begin
    aluFP : alu_fp
 	port map(
 		x  => 
-      y  => 
-      op => op(9 downto 3),
-      w  =>
+		y  => 
+        op => op(9 downto 3),
+        w  =>
 		invalid_division =>
 		overflow =>
 	); 
