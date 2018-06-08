@@ -60,7 +60,8 @@ architecture Structure of datapath is
           op : IN  STD_LOGIC_VECTOR(6 DOWNTO 0); 
           w  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 invalid_division : OUT STD_LOGIC;
-			 overflow : OUT STD_LOGIC
+			 overflow : OUT STD_LOGIC;
+		    clk : IN STD_LOGIC
 			 ); 
 	end component;
  
@@ -240,6 +241,7 @@ begin
         w  =>
 		invalid_division =>
 		overflow =>
+		clk => clk
 	); 
    
 end Structure;
