@@ -28,6 +28,8 @@ ENTITY control_l IS
 		d_sys         : OUT STD_LOGIC; --permis escriptura sysBR
 		sel_br        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
 		b_br			  : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
+		sel_alu_w	  : OUT STD_LOGIC; --indica si hem de seleccionar la w de la ALU INT o FP
+		sel_mem_dat	  : OUT STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
 		enable_int    : OUT STD_LOGIC;
 		disable_int   : OUT STD_LOGIC;
 		reti          : OUT STD_LOGIC;
@@ -36,7 +38,7 @@ ENTITY control_l IS
 		invalid_instr : OUT STD_LOGIC;
 		calls         : OUT STD_LOGIC;
 		instr_protected : OUT STD_LOGIC;
-		flush         : OUT STD_LOGIC;
+		flush          : OUT STD_LOGIC;
 		wr_tlb_pi      : OUT STD_LOGIC;
 		wr_tlb_pd      : OUT STD_LOGIC;
 		wr_tlb_vi      : OUT STD_LOGIC;
@@ -45,6 +47,10 @@ ENTITY control_l IS
 END control_l;
 ARCHITECTURE Structure OF control_l IS
 
+	CONSTANT OP_COMP_FLOAT 	: STD_LOGIC_VECTOR (3 DOWNTO 0) := "1001";
+	CONSTANT LD_FLOAT 		: STD_LOGIC_VECTOR (3 DOWNTO 0) := "1011";
+	CONSTANT ST_FLOAT 		: STD_LOGIC_VECTOR (3 DOWNTO 0) := "1100";
+	
 	SIGNAL operation : std_LOGIC_VECTOR(9 DOWNTO 0);
  
 BEGIN
@@ -101,7 +107,7 @@ BEGIN
 	wrd_gp_int <= '0' WHEN (ir(15 DOWNTO 12) = "1111" AND ir(4 DOWNTO 0) /= "01100" AND ir(4 DOWNTO 0) /= "01000") OR ir(15 DOWNTO 12) = "0100" 
 						OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0110" OR operation(9 DOWNTO 5) = "10100" 
 						OR operation(9 DOWNTO 5) = "01111" ELSE
-	     	   '1';
+					  '1';
 				
 	wrd_gp_fp <= '1' WHEN ir(15 DOWNTO 12) = "1001" OR ir(15 DOWNTO 12) = "1011" ELSE --OP/CMP FP or LDF
 					 '0';
@@ -109,7 +115,7 @@ BEGIN
 	d_sys <= '1' WHEN ir(15 DOWNTO 12) = "1111" AND ir(5 DOWNTO 0) = "110000" ELSE
 	         '0';
 	
-	sel_br <= "10" WHEN ir(15 DOWNTO 12) = "1001" ELSE --BRfp
+	sel_br <= "10" WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT OR ir(15 DOWNTO 12) = ST_FLOAT ELSE --BRfp
 				 "01" WHEN ir(15 DOWNTO 12) = "1111" AND (ir(5 DOWNTO 0) = "101100" OR ir(5 DOWNTO 0) = "100100") ELSE --BRsys
 				 "00"; --BRint
 				 
@@ -174,4 +180,13 @@ BEGIN
 	             '0' WHEN OTHERS;
  
 	op <= operation;
+	
+	sel_alu_w <= '1' WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT ELSE
+	
+					 '0'; -- Solo cuando utilizas la ALU FP 
+	
+	sel_mem_dat <= '1' WHEN ir(15 DOWNTO 12) = ST_FLOAT ELSE
+	
+						'0';
+	
 END Structure;

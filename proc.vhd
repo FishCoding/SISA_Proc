@@ -64,6 +64,8 @@ ARCHITECTURE Structure OF proc IS
 		   wrd_gp_int 		  : IN STD_LOGIC;
 		   wrd_gp_fp        : IN STD_LOGIC;
 			d_sys            : IN STD_LOGIC;
+			sel_alu_w 		  : IN STD_LOGIC;
+			sel_mem_dat	  	  : IN STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
 			sel_br           : IN STD_LOGIC_VECTOR (1 DOWNTO 0);
 			addr_a           : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d           : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -121,7 +123,10 @@ ARCHITECTURE Structure OF proc IS
 			wr_out          : OUT STD_LOGIC;
 			d_sys           : OUT STD_LOGIC; --permis escriptura sysBR
 			sel_br          : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
+			sel_mem_dat	    : OUT STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
 			b_br			    : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
+			sel_alu_w	  	 : OUT STD_LOGIC; --indica si hem de seleccionar la w de la ALU INT o FP
+			sel_mem_dat	    : OUT STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
 			sys             : OUT STD_LOGIC;
 			enable_int      : OUT STD_LOGIC;
 			disable_int     : OUT STD_LOGIC;
@@ -208,9 +213,11 @@ ARCHITECTURE Structure OF proc IS
  
 	SIGNAL jump_addr_s        : std_logic_vector(15 DOWNTO 0);
  
-	SIGNAL sel_br_s           : std_logic;
+	SIGNAL sel_br_s           : std_logic_vector (1 downto 0);
 	SIGNAL d_sys_s            : std_logic;
 	SIGNAL b_br_s             : std_logic;
+	SIGNAL sel_alu_s			  : std_logic;
+	SIGNAL sel_mem_dat_s		  : std_logic;
 	SIGNAL sys_s              : std_logic;
  
 	SIGNAL enable_int_s       : std_logic;
@@ -233,7 +240,7 @@ ARCHITECTURE Structure OF proc IS
 
 	SIGNAL calls_s            : std_logic;
 
-	SIGNAL 	instr_protected_s  : std_logic;
+	SIGNAL instr_protected_s  : std_logic;
 	
 	SIGNAL value_data_s : std_logic_vector(15 downto 0);
 	
@@ -243,6 +250,10 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL wr_tlb_vi_s : std_logic;
 	
 	SIGNAL condicion_pc_fancy : std_logic;
+	
+	SIGNAL wrd_fp_signal	 : std_logic;
+	SIGNAL wrd_int_signal : std_logic;
+	
 BEGIN
 	
 	flush_tlb_datos <= flush and reg_A(1);
@@ -315,10 +326,13 @@ BEGIN
 		clk           => clk, 
 		datard_m      => datard_m, 
 		op            => op_signal, 
-		wrd           => wrd_signal, 
-		sel_br        => sel_br_s, 
+		wrd_gp_int    => wrd_int_signal, 
+		wrd_gp_fp	  => wrd_fp_signal,
+		sel_br        => sel_br_s,
+		sel_mem_dat	  => sel_mem_dat_s,
 		d_sys         => d_sys_s, 
 		b_br 			  => b_br_s,
+		sel_alu_w	  => sel_alu_s,
 		addr_a        => addr_a_signal, 
 		addr_d        => addr_d_signal, 
 		addr_b        => addr_b_signal, 
@@ -359,8 +373,11 @@ BEGIN
 	(
 		clk              => clk, 
 		op               => op_signal, 
-		wrd              => wrd_signal, 
-		sel_br           => sel_br_s, 
+		wrd_gp_fp        => wrd_fp_signal, 
+		wrd_gp_int		  => wrd_int_signal,
+		sel_br           => sel_br_s,
+		sel_alu_w		  => sel_alu_s,
+		sel_mem_dat		  => sel_mem_dat_s,
 		d_sys            => d_sys_s, 
 		addr_a           => addr_a_signal, 
 		addr_d           => addr_d_signal, 
@@ -415,5 +432,4 @@ BEGIN
 		estado_cpu        => estado_cpu_s
 	);
  
-
 END Structure;

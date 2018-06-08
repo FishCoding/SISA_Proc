@@ -80,8 +80,12 @@ BEGIN
 
 	d_sys     <= d_sys_l WHEN estado_actual = DEMBOW and excepr='0' ELSE '0';
 
-	a_sys     <= a_sys_l WHEN estado_actual = DEMBOW ELSE
-	         '1' WHEN estado_actual = SYSTEM ELSE
-	         '0';
+--	a_sys     <= a_sys_l WHEN estado_actual = DEMBOW ELSE
+--					 '1' WHEN estado_actual = SYSTEM ELSE
+--					 '0';
+					 
+	sel_br    <= sel_br_l 	WHEN estado_actual = DEMBOW ELSE
+					 "01" 		WHEN estado_actual = SYSTEM ELSE
+					 "00";
 
 END Structure;

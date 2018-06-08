@@ -9,6 +9,8 @@ entity datapath is
 		wrd_gp_int : in STD_LOGIC;
 		wrd_gp_fp  : in STD_LOGIC;
 		d_sys : in STD_LOGIC;
+		sel_alu_w : IN STD_LOGIC_VECTOR;
+		sel_mem_dat	: IN STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
 		sel_br : in STD_LOGIC_VECTOR(1 downto 0);
 		addr_a : in STD_LOGIC_VECTOR(2 downto 0);
 		addr_d : in STD_LOGIC_VECTOR(2 downto 0);
@@ -99,12 +101,15 @@ architecture Structure of datapath is
 	end component;
 
 	signal salida_alu : std_LOGIC_VECTOR(15 downto 0);
+	signal salida_alu_fp : STD_LOGIC_VECTOR (15 downto 0);
+	signal salida_alu_int : STD_LOGIC_VECTOR (15 downto 0);
 	signal a_escribir : std_LOGIC_VECTOR(15 downto 0);
 	signal a_leer : std_LOGIC_VECTOR(15 downto 0);
 	signal inmediato : std_LOGIC_VECTOR(15 downto 0);
 	signal z_s : std_logic;
 	signal Rb_N : std_logic_vector(15 downto 0);
-	signal reg_b : std_logic_vector (15 downto 0);
+	signal b_GP_INT : std_logic_vector (15 downto 0);
+	signal b_GP_FP  : std_logic_vector (15 downto 0);
 	signal a_S : std_logic_vector(15 downto 0);
 	signal a_GP_INT : std_logic_vector(15 downto 0);
 	signal a_GP_FP  : std_logic_vector(15 downto 0);
@@ -116,9 +121,12 @@ architecture Structure of datapath is
 	signal addr_m_s : std_logic_vector(15 downto 0);
 	signal addr_m_fancy : std_logic_vector(15 downto 0);
 
+	signal overflow_fp 			 : std_logic;
+	signal exc_invalid_division : std_logic;
 
 begin
-	with in_d select
+
+	with in_d select -- esto va a los br's (puerto d)
 	a_escribir <= salida_alu when "00", 
 	              datard_m 	 when "01", 	
 	              std_logic_vector(unsigned(pc) + 2) when "10", 
@@ -155,13 +163,16 @@ begin
 	        inmediato when "1101", 
 	        inmediato when "1110", 
 	        inmediato when "0101", 
-	        reg_b when others;
+			  b_GP_FP   when "1001",
+	        b_GP_INT 	when others;
 
 	jump_addr <= a_leer;
  
-	data_wr <= reg_b;
+	data_wr <= b_GP_INT WHEN sel_mem_dat = '0' ELSE
+	
+				  b_GP_FP; -- En memoria puede ir tanto un float como un INT
  
-	wr_io <= reg_b;
+	wr_io <= b_GP_INT;
  
 	tknbr <= "01" when (op(9 downto 5) = "01100" and z_s = '1') or(op(9 downto 5) = "01101" and z_s = '0') else
 	         "10" when (op(9 downto 3) = "1010000" and z_s = '1') or
@@ -171,8 +182,8 @@ begin
 	         "00";
 	-- mover al control l
 	
-	a <= a_R;
-	b <= reg_b;
+	a <= a_GP_INT; -- SON COSAS DE LA TLB SIEMPRE DEL REG DE ENTEROS
+	b <= b_GP_INT;
 	
 	regGeneralPurposeINT : regfile
 	port map(
@@ -183,7 +194,7 @@ begin
 		addr_d => addr_d, 
 		a => a_GP_INT, 
 		addr_b => addr_b, 
-		b => reg_b
+		b => b_GP_INT
 	);
 	
 	regGeneralPurposeFP : regfile
@@ -195,7 +206,7 @@ begin
 		addr_d => addr_d,
 		a => a_GP_FP,
 		addr_b => addr_b,
-		b => reg_b
+		b => b_GP_FP
 	);
 	
 	regS : system_regfile
@@ -219,7 +230,7 @@ begin
  
 	with sel_br select -- Permite seleccionar el banco de registros del cual se lee el puerto A
 	a_leer <= a_GP_INT  	when "00",
-			  a_S			when "01",  
+				 a_S			when "01",  
 	          a_GP_FP 	when others; -- 10, 11 ...
  
 	alu0 : alu
@@ -228,18 +239,22 @@ begin
 		y => Rb_N, 
 		op => op(9 downto 3), 
 		z => z_s, 
-		w => salida_alu, 
+		w => salida_alu_int, 
 		invalid_division => invalid_division
 	);
  
    aluFP : alu_fp
 	port map(
-		x  => 
-		y  => 
-        op => op(9 downto 3),
-        w  =>
-		invalid_division =>
-		overflow =>
+		x  => a_leer,
+		y  => Rb_N,
+      op => op(9 downto 3),
+      w  => salida_alu_fp,
+		invalid_division => exc_invalid_division,
+		overflow => overflow_fp
 	); 
+	
+	salida_alu <= salida_alu_int WHEN sel_alu_w = '0' ELSE
+	
+					  salida_alu_fp; 
    
 end Structure;
