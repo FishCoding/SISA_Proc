@@ -126,7 +126,6 @@ ARCHITECTURE Structure OF proc IS
 			sel_mem_dat	    : OUT STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
 			b_br			    : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
 			sel_alu_w	  	 : OUT STD_LOGIC; --indica si hem de seleccionar la w de la ALU INT o FP
-			sel_mem_dat	    : OUT STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
 			sys             : OUT STD_LOGIC;
 			enable_int      : OUT STD_LOGIC;
 			disable_int     : OUT STD_LOGIC;

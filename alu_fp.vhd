@@ -53,12 +53,10 @@ end component;
 --Operaciones logicas y aritmeticas 
 signal addsub : std_logic_vector(15 DOWNTO 0); 
 
-
 --Comparaciones 
 signal cmplt_s : std_logic_vector(15 downto 0); 
 signal cmple_s : std_logic_vector(15 downto 0); 
 signal cmpeq_s : std_logic_vector(15 downto 0); 
-
 
 --Extension aritmetica 
 signal mul_s : std_logic_vector(15 downto 0); 
@@ -72,13 +70,18 @@ signal mantissa_output : std_logic_vector(22 downto 0);
 signal exponent_output : std_logic_vector(7 downto 0);
 signal overflow_sig : std_logic;
 signal add_sub_s : std_logic_vector(31 downto 0);
-signal mult : std_logic_vector(31 downto 0);
-signal div : std_logic_vector(31 downto 0);
+signal a : std_logic_vector (15 downto 0);
+signal b : std_logic_vector (15 downto 0);
+--signal mult : std_logic_vector(31 downto 0);
+--signal div : std_logic_vector(31 downto 0);
  
 signal salida : std_logic_vector(15 downto 0); 
  
 BEGIN 
    
+	a <= x; 
+	b <= y; -- Es esto lo que se quiere?
+	
 	--Convertimos a FP 32 bits
 	a_mantissa_input <= a(8 downto 0) & "00000000000000";
 	b_mantissa_input <= b(8 downto 0) & "00000000000000";
@@ -120,14 +123,16 @@ BEGIN
 		clock	 => clk,
 		dataa	 => a(15) & a_exponent_input & a_mantissa_input,
 		datab	 => b(15) & b_exponent_input & b_mantissa_input,
-		result	 => mult
+		result	 => mul_s
 	);
 	
 	div_inst : div PORT MAP (
 		clock	 => clk,
 		dataa	 => a(15) & a_exponent_input & a_mantissa_input,
 		datab	 => b(15) & b_exponent_input & b_mantissa_input,
-		result	 => div
+		result	 => div_s
 	);
+	
+	w <= salida;
 	 
 END Structure;

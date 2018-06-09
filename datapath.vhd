@@ -9,7 +9,7 @@ entity datapath is
 		wrd_gp_int : in STD_LOGIC;
 		wrd_gp_fp  : in STD_LOGIC;
 		d_sys : in STD_LOGIC;
-		sel_alu_w : IN STD_LOGIC_VECTOR;
+		sel_alu_w : IN STD_LOGIC;
 		sel_mem_dat	: IN STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
 		sel_br : in STD_LOGIC_VECTOR(1 downto 0);
 		addr_a : in STD_LOGIC_VECTOR(2 downto 0);
@@ -251,7 +251,8 @@ begin
       op => op(9 downto 3),
       w  => salida_alu_fp,
 		invalid_division => exc_invalid_division,
-		overflow => overflow_fp
+		overflow => overflow_fp,
+		clk => clk
 	); 
 	
 	salida_alu <= salida_alu_int WHEN sel_alu_w = '0' ELSE
