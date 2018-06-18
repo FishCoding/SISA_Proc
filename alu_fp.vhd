@@ -51,7 +51,11 @@ component div
 end component;
  
 --Operaciones logicas y aritmeticas 
-signal addsub : std_logic_vector(15 DOWNTO 0); 
+signal add_sub_s : std_logic_vector(31 DOWNTO 0); 
+signal mantissa_suma : std_logic_vector(8 downto 0);
+signal exp_suma : std_logic_vector(5 downto 0);
+signal add_sub_def : std_logic_vector(15 downto 0);
+signal aux_sum : std_logic_vector(7 downto 0);
 
 --Comparaciones 
 signal cmplt_s : std_logic_vector(15 downto 0); 
@@ -59,19 +63,30 @@ signal cmple_s : std_logic_vector(15 downto 0);
 signal cmpeq_s : std_logic_vector(15 downto 0); 
 
 --Extension aritmetica 
-signal mul_s : std_logic_vector(15 downto 0); 
-signal div_s : std_logic_vector(15 downto 0); 
+signal mult_s : std_logic_vector(15 downto 0); 
+signal mantissa_mult : std_logic_vector(8 downto 0);
+signal exp_mult : std_logic_vector(5 downto 0);
+signal mult_def : std_logic_vector(15 downto 0);
+signal aux_mult : std_logic_vector(7 downto 0);
 
+signal div_s : std_logic_vector(15 downto 0); 
+signal mantissa_div : std_logic_vector(8 downto 0);
+signal exp_div : std_logic_vector(5 downto 0);
+signal div_def : std_logic_vector(15 downto 0);
+signal aux_div : std_logic_vector(7 downto 0);
+
+--Inputs
 signal a_mantissa_input : std_logic_vector(22 downto 0);
 signal a_exponent_input : std_logic_vector(7 downto 0);
 signal b_mantissa_input : std_logic_vector(22 downto 0);
 signal b_exponent_input : std_logic_vector(7 downto 0);
-signal mantissa_output : std_logic_vector(22 downto 0);
-signal exponent_output : std_logic_vector(7 downto 0);
-signal overflow_sig : std_logic;
-signal add_sub_s : std_logic_vector(31 downto 0);
 signal a : std_logic_vector (15 downto 0);
 signal b : std_logic_vector (15 downto 0);
+
+
+
+signal overflow_sig : std_logic;
+
 --signal mult : std_logic_vector(31 downto 0);
 --signal div : std_logic_vector(31 downto 0);
  
@@ -80,31 +95,48 @@ signal salida : std_logic_vector(15 downto 0);
 BEGIN 
    
 	a <= x; 
-	b <= y; -- Es esto lo que se quiere?
+	b <= y; 
 	
 	--Convertimos a FP 32 bits
 	a_mantissa_input <= a(8 downto 0) & "00000000000000";
 	b_mantissa_input <= b(8 downto 0) & "00000000000000";
-	a_exponent_input <= std_logic_vector(unsigned(a(14 downto 9)) - 31 + 127); 
-	b_exponent_input <= std_logic_vector(unsigned(b(14 downto 9)) - 31 + 127); 
 	
-	--Convertimos a FP 16 bits
-	exponent_output <= std_logic_vector(unsigned(add_sub_s(30 downto 23)) - 127 + 31);
-	mantissa_output <= add_sub_s(22 downto 14);
-		
-   
-	 
-	 addsub <= add_sub_s(31) & exponent_output & mantissa_output;
-	 
+	a_exponent_input <= std_logic_vector(unsigned("00" & std_logic_vector(unsigned(a(14 downto 9)) - 31)) + 127); 
+--	a_exponent_input <= std_logic_vector(unsigned(a(14 downto 9)) - 31 + 127); 
+	b_exponent_input <= std_logic_vector(unsigned("00" & std_logic_vector(unsigned(b(14 downto 9)) - 31)) + 127); 
+	
+	
+	--Convertimos a FP 16 bits | SUMA Y RESTA
+	aux_sum <= std_logic_vector(unsigned(add_sub_s(30 downto 23)) - 127);
+	exp_suma <= std_logic_vector(unsigned(std_logic_vector(unsigned(add_sub_s(30 downto 23)) - 127)(5 downto 0)) + 31);
+	mantissa_suma <= add_sub_s(22 downto 14);
+	
+	add_sub_def <= add_sub_s(31) & exp_suma & mantissa_suma;	
+	
+	--Convertimos a FP 16 bits | MULT
+	aux_mult <= std_logic_vector(unsigned(mult_s(30 downto 23)) - 127);
+	exp_mult <= std_logic_vector(unsigned(std_logic_vector(unsigned(mult_s(30 downto 23)) - 127)(5 downto 0)) + 31);
+	mantissa_mult <= mult_s(22 downto 14);
+	
+	mult_def <= mult_s(31) & exp_mult & mantissa_mult;	
+	
+	--Convertimos a FP 16 bits | DIV
+	aux_div <= std_logic_vector(unsigned(div_s(30 downto 23)) - 127);
+	exp_div <= 	std_logic_vector(unsigned(aux_div())) + 31);
+	mantissa_div <= div_s(22 downto 14);
+	
+	div_def <= div_s(31) & exp_div & mantissa_div;	
+
+	
 	 --Decidir la salida
 	 with op(2 downto 0) select
-		salida <= addsub   when "000",
-				    addsub   when "001",
-				    mul_s   when "010",
-				    div_s   when "011",
-				    cmplt_s when "100",
-				    cmple_s when "101",
-				    cmpeq_s when others; --when "111";
+		salida <= add_sub_def when "000",
+				    add_sub_def when "001",
+				    mult_def    when "010",
+				    div_def     when "011",
+				    cmplt_s     when "100",
+				    cmple_s     when "101",
+				    cmpeq_s     when others; --when "111";
 				  
 	invalid_division <= '1' when op(6 downto 0) = "1001011" 
 								 and (y = "0000000000000000" or y = "1000000000000000") else
@@ -119,14 +151,16 @@ BEGIN
 		result	 => add_sub_s
 	);
 
-	mult_inst : mult PORT MAP (
+	mult_inst : mult 
+	PORT MAP (
 		clock	 => clk,
 		dataa	 => a(15) & a_exponent_input & a_mantissa_input,
 		datab	 => b(15) & b_exponent_input & b_mantissa_input,
-		result	 => mul_s
+		result	 => mult_s
 	);
 	
-	div_inst : div PORT MAP (
+	div_inst : div 
+	PORT MAP (
 		clock	 => clk,
 		dataa	 => a(15) & a_exponent_input & a_mantissa_input,
 		datab	 => b(15) & b_exponent_input & b_mantissa_input,
