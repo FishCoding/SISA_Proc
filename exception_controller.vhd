@@ -8,25 +8,27 @@ ENTITY exception_controller IS
 	(
 		clk : IN STD_LOGIC;
 		--addr and byte_word
-		op                : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
-		byte_word         : IN STD_LOGIC;
-		addr              : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-		exception_value   : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-		excepr            : OUT STD_LOGIC; -- Change to system INTR EXCEP CALLS
-		invalid_division  : IN STD_LOGIC;
-		invalid_instr     : IN STD_LOGIC;
-		intr              : IN STD_LOGIC;
-		calls             : IN STD_LOGIC;
-		state_word        : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-		instr_protected   : IN STD_LOGIC;
---		value_data        : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		system            : IN STD_LOGIC;
-		tlb_miss_inst     : IN STD_LOGIC;
-		tlb_miss_datos    : IN STD_LOGIC;
-		tlb_invalid_inst  : IN STD_LOGIC;
-		tlb_invalid_datos : IN STD_LOGIC;
-		tlb_lectura_datos : IN STD_LOGIC;
-		estado_cpu        : IN STD_LOGIC_VECTOR(1 DOWNTO 0)
+		op                  : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+		byte_word           : IN STD_LOGIC;
+		addr                : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+		exception_value     : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+		excepr              : OUT STD_LOGIC; -- Change to system INTR EXCEP CALLS
+		invalid_division    : IN STD_LOGIC;
+		invalid_division_fp : IN STD_LOGIC;
+		overflow_fp         : IN STD_LOGIC;
+		invalid_instr       : IN STD_LOGIC;
+		intr                : IN STD_LOGIC;
+		calls               : IN STD_LOGIC;
+		state_word          : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+		instr_protected     : IN STD_LOGIC;
+--		value_data          : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+		system              : IN STD_LOGIC;
+		tlb_miss_inst       : IN STD_LOGIC;
+		tlb_miss_datos      : IN STD_LOGIC;
+		tlb_invalid_inst    : IN STD_LOGIC;
+		tlb_invalid_datos   : IN STD_LOGIC;
+		tlb_lectura_datos   : IN STD_LOGIC;
+		estado_cpu          : IN STD_LOGIC_VECTOR(1 DOWNTO 0)
 	);
 END exception_controller;
 ARCHITECTURE Structure OF exception_controller IS
@@ -64,10 +66,12 @@ BEGIN
  
 	excepr <= NOT(system) AND (calls OR illegal_mem_access_s OR instr_protected_s OR illegal_addr_s OR invalid_instr OR invalid_division OR 
 								tlb_miss_inst_s OR tlb_miss_datos_s OR tlb_invalid_inst_s OR tlb_invalid_datos_s OR tlb_prot_inst_s OR
-								tlb_prot_datos_s OR tlb_lectura_datos_s);-- calls_s or
+								tlb_prot_datos_s OR tlb_lectura_datos_s OR invalid_division_fp OR overflow_fp);-- calls_s or
 
 	exception_value_s   <= x"0" WHEN invalid_instr = '1' ELSE
 	                       x"1" WHEN illegal_addr_s = '1' ELSE
+								  x"2" WHEN overflow_fp = '1' ELSE
+								  x"3" WHEN invalid_division_fp = '1' ELSE
 	                       x"4" WHEN invalid_division = '1' ELSE
 	                       x"6" WHEN tlb_miss_inst_s = '1' ELSE
 	                       x"7" WHEN tlb_miss_datos_s = '1' ELSE

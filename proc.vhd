@@ -92,7 +92,9 @@ ARCHITECTURE Structure OF proc IS
 			id_excep         : IN STD_LOGIC_VECTOR(3 DOWNTO 0);	
 			a                : OUT STD_LOGIC_VECTOR(15 downto 0);
 			b                : OUT STD_LOGIC_VECTOR(15 downto 0);
-			pc_fancy         : IN STD_LOGIC_VECTOR(15 downto 0)
+			pc_fancy         : IN STD_LOGIC_VECTOR(15 downto 0);
+			invalid_division_fp : out STD_LOGIC;
+			overflow_fp : out STD_LOGIC
 		);
  
 	END COMPONENT;
@@ -151,25 +153,27 @@ ARCHITECTURE Structure OF proc IS
 		PORT 
 		(
 			clk : IN STD_LOGIC;
-			op                : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
-			byte_word         : IN STD_LOGIC;
-			addr              : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-			exception_value   : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-			excepr            : OUT STD_LOGIC;
-			invalid_division  : IN STD_LOGIC;
-			intr              : IN STD_LOGIC;
-			invalid_instr     : IN STD_LOGIC;
-			calls             : IN STD_LOGIC;
-			state_word 		  : IN STD_LOGIC_VECTOR(15 downto 0);
-			instr_protected   : IN STD_LOGIC;
---			value_data 		  : OUT STD_LOGIC_VECTOR(15 downto 0);
-			system            : IN STD_LOGIC;
-			tlb_miss_inst     : IN STD_LOGIC;
-			tlb_miss_datos    : IN STD_LOGIC;
-			tlb_invalid_inst  : IN STD_LOGIC;
-			tlb_invalid_datos : IN STD_LOGIC;
-			tlb_lectura_datos : IN STD_LOGIC;
-			estado_cpu        : IN STD_LOGIC_VECTOR(1 downto 0)
+			op                  : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+			byte_word           : IN STD_LOGIC;
+			addr                : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+			exception_value     : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+			excepr              : OUT STD_LOGIC;
+			invalid_division    : IN STD_LOGIC;
+			invalid_division_fp : IN STD_LOGIC;
+			overflow_fp         : IN STD_LOGIC;
+			intr                : IN STD_LOGIC;
+			invalid_instr       : IN STD_LOGIC;
+			calls               : IN STD_LOGIC;
+			state_word 		     : IN STD_LOGIC_VECTOR(15 downto 0);
+			instr_protected     : IN STD_LOGIC;
+--			value_data 		     : OUT STD_LOGIC_VECTOR(15 downto 0);
+			system              : IN STD_LOGIC;
+			tlb_miss_inst       : IN STD_LOGIC;
+			tlb_miss_datos      : IN STD_LOGIC;
+			tlb_invalid_inst    : IN STD_LOGIC;
+			tlb_invalid_datos   : IN STD_LOGIC;
+			tlb_lectura_datos   : IN STD_LOGIC;
+			estado_cpu          : IN STD_LOGIC_VECTOR(1 downto 0)
 		);
 	END COMPONENT;
  
@@ -252,6 +256,9 @@ ARCHITECTURE Structure OF proc IS
 	
 	SIGNAL wrd_fp_signal	 : std_logic;
 	SIGNAL wrd_int_signal : std_logic;
+	
+	SIGNAL invalid_division_fp_s : std_logic;
+	SIGNAL overflow_fp_s : std_logic;
 	
 BEGIN
 	
@@ -403,7 +410,9 @@ BEGIN
 		id_excep         => exception_value_s,
 		a                => reg_A,
 		b                => reg_B,
-		pc_fancy         => pc_signal_fancy
+		pc_fancy         => pc_signal_fancy,
+		invalid_division_fp => invalid_division_fp_s,
+		overflow_fp => overflow_fp_s
 	);
 	
 	excep_controller : exception_controller
@@ -416,6 +425,8 @@ BEGIN
 		exception_value   => exception_value_s, 
 		excepr            => except_s, 
 		invalid_division  => invalid_division_s, 
+		invalid_division_fp => invalid_division_fp_s,
+		overflow_fp         => overflow_fp_s,
 		invalid_instr     => invalid_instr_s, 
 		intr              => intr_s, 
 		calls             => calls_s,

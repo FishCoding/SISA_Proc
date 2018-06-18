@@ -39,7 +39,9 @@ entity datapath is
 		id_excep : IN STD_LOGIC_VECTOR(3 downto 0);
 		a : out std_logic_vector(15 downto 0);
 		b : out std_logic_vector(15 downto 0);
-		pc_fancy  : IN STD_LOGIC_VECTOR(15 downto 0)
+		pc_fancy  : IN STD_LOGIC_VECTOR(15 downto 0);
+		invalid_division_fp : out STD_LOGIC;
+		overflow_fp : out STD_LOGIC
 	);
 end datapath;
 architecture Structure of datapath is
@@ -122,7 +124,7 @@ architecture Structure of datapath is
 	signal addr_m_s : std_logic_vector(15 downto 0);
 	signal addr_m_fancy : std_logic_vector(15 downto 0);
 
-	signal overflow_fp 			 : std_logic;
+	signal overflow_signal 			 : std_logic;
 	signal exc_invalid_division : std_logic;
 
 begin
@@ -251,12 +253,14 @@ begin
       op => op(9 downto 3),
       w  => salida_alu_fp,
 		invalid_division => exc_invalid_division,
-		overflow => overflow_fp,
+		overflow => overflow_signal,
 		clk => clk
 	); 
 	
-	salida_alu <= salida_alu_int WHEN sel_alu_w = '0' ELSE
+	overflow_fp <= overflow_signal;
+	invalid_division_fp <= exc_invalid_division;
 	
+	salida_alu <= salida_alu_int WHEN sel_alu_w = '0' ELSE
 					  salida_alu_fp; 
    
 end Structure;

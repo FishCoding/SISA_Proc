@@ -49,6 +49,16 @@ component div
 		result		: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
 	);
 end component;
+
+component cmp
+	PORT
+	(
+		clock		: IN STD_LOGIC ;
+		dataa		: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+		datab		: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+		alb		: OUT STD_LOGIC 
+	);
+end component;
  
 --Operaciones logicas y aritmeticas 
 signal add_sub_s : std_logic_vector(31 DOWNTO 0); 
@@ -58,9 +68,9 @@ signal add_sub_def : std_logic_vector(15 downto 0);
 signal aux_sum : std_logic_vector(7 downto 0);
 
 --Comparaciones 
-signal cmplt_s : std_logic_vector(15 downto 0); 
-signal cmple_s : std_logic_vector(15 downto 0); 
-signal cmpeq_s : std_logic_vector(15 downto 0); 
+signal cmplt_s : std_logic; 
+signal cmple_s : std_logic; 
+signal cmpeq_s : std_logic; 
 
 --Extension aritmetica 
 signal mult_s : std_logic_vector(31 downto 0); 
@@ -128,19 +138,21 @@ BEGIN
 	div_def <= div_s(31) & exp_div & mantissa_div;	
 
 	
+	cmple_s <= cmplt_s or cmpeq_s;
+	
 	 --Decidir la salida
 	 with op(2 downto 0) select
-		salida <= add_sub_def when "000",
-				    add_sub_def when "001",
-				    mult_def    when "010",
-				    div_def     when "011",
-				    cmplt_s     when "100",
-				    cmple_s     when "101",
-				    cmpeq_s     when others; --when "111";
+		salida <= add_sub_def 							when "000",
+				    add_sub_def 							when "001",
+				    mult_def    							when "010",
+				    div_def     							when "011",
+				    "000000000000000" & cmplt_s     when "100",
+				    "000000000000000" & cmple_s     when "101",
+				    "000000000000000" & cmpeq_s     when others; --when "111";
 				  
-	invalid_division <= '1' when op(6 downto 0) = "1001011" 
-								 and (y = "0000000000000000" or y = "1000000000000000") else
-						'0';
+	
+							  
+							  
 	add_sub_fp_inst : add_sub_fp 
 	PORT MAP (
 		add_sub	 => op(0),
@@ -167,6 +179,18 @@ BEGIN
 		result	 => div_s
 	);
 	
+	cmp_inst : cmp 
+	PORT MAP (
+		clock	 => clk,
+		dataa	 => a(15) & a_exponent_input & a_mantissa_input,
+		datab	 => b(15) & b_exponent_input & b_mantissa_input,
+		alb	 => cmplt_s
+	);
+	
+	invalid_division <= '1' when op(6 downto 0) = "1001011" and (y = "0000000000000000" or y = "1000000000000000") else
+						     '0';
+	overflow <= overflow_sig when op(6 downto 0) = "1001000" or op(6 downto 0) = "1001001" else --ADDF y SUBF
+					'0';
 	w <= salida;
 	 
 END Structure;
