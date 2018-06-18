@@ -63,13 +63,13 @@ signal cmple_s : std_logic_vector(15 downto 0);
 signal cmpeq_s : std_logic_vector(15 downto 0); 
 
 --Extension aritmetica 
-signal mult_s : std_logic_vector(15 downto 0); 
+signal mult_s : std_logic_vector(31 downto 0); 
 signal mantissa_mult : std_logic_vector(8 downto 0);
 signal exp_mult : std_logic_vector(5 downto 0);
 signal mult_def : std_logic_vector(15 downto 0);
 signal aux_mult : std_logic_vector(7 downto 0);
 
-signal div_s : std_logic_vector(15 downto 0); 
+signal div_s : std_logic_vector(31 downto 0); 
 signal mantissa_div : std_logic_vector(8 downto 0);
 signal exp_div : std_logic_vector(5 downto 0);
 signal div_def : std_logic_vector(15 downto 0);
@@ -108,21 +108,21 @@ BEGIN
 	
 	--Convertimos a FP 16 bits | SUMA Y RESTA
 	aux_sum <= std_logic_vector(unsigned(add_sub_s(30 downto 23)) - 127);
-	exp_suma <= std_logic_vector(unsigned(std_logic_vector(unsigned(add_sub_s(30 downto 23)) - 127)(5 downto 0)) + 31);
+	exp_suma <= std_logic_vector(unsigned(aux_sum(5 downto 0)) + 31);
 	mantissa_suma <= add_sub_s(22 downto 14);
 	
 	add_sub_def <= add_sub_s(31) & exp_suma & mantissa_suma;	
 	
 	--Convertimos a FP 16 bits | MULT
 	aux_mult <= std_logic_vector(unsigned(mult_s(30 downto 23)) - 127);
-	exp_mult <= std_logic_vector(unsigned(std_logic_vector(unsigned(mult_s(30 downto 23)) - 127)(5 downto 0)) + 31);
+	exp_mult <= std_logic_vector(unsigned(aux_mult(5 downto 0)) + 31);
 	mantissa_mult <= mult_s(22 downto 14);
 	
 	mult_def <= mult_s(31) & exp_mult & mantissa_mult;	
 	
 	--Convertimos a FP 16 bits | DIV
 	aux_div <= std_logic_vector(unsigned(div_s(30 downto 23)) - 127);
-	exp_div <= 	std_logic_vector(unsigned(aux_div())) + 31);
+	exp_div <= 	std_logic_vector(unsigned(aux_div(5 downto 0)) + 31);
 	mantissa_div <= div_s(22 downto 14);
 	
 	div_def <= div_s(31) & exp_div & mantissa_div;	

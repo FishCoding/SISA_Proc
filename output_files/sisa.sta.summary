@@ -1,0 +1,77 @@
+------------------------------------------------------------
+TimeQuest Timing Analyzer Summary
+------------------------------------------------------------
+
+Type  : Slow Model Setup 'counter_div_clk[2]'
+Slack : -80.561
+TNS   : -41426.859
+
+Type  : Slow Model Setup 'vga_controller:VGACONT|clk_25mhz'
+Slack : -79.945
+TNS   : -13660.829
+
+Type  : Slow Model Setup 'CLOCK_50'
+Slack : -76.843
+TNS   : -67772.149
+
+Type  : Slow Model Hold 'CLOCK_50'
+Slack : -2.690
+TNS   : -5.380
+
+Type  : Slow Model Hold 'counter_div_clk[2]'
+Slack : 0.445
+TNS   : 0.000
+
+Type  : Slow Model Hold 'vga_controller:VGACONT|clk_25mhz'
+Slack : 0.445
+TNS   : 0.000
+
+Type  : Slow Model Minimum Pulse Width 'counter_div_clk[2]'
+Slack : -2.064
+TNS   : -2864.444
+
+Type  : Slow Model Minimum Pulse Width 'vga_controller:VGACONT|clk_25mhz'
+Slack : -2.064
+TNS   : -1584.824
+
+Type  : Slow Model Minimum Pulse Width 'CLOCK_50'
+Slack : -1.631
+TNS   : -5200.019
+
+Type  : Fast Model Setup 'counter_div_clk[2]'
+Slack : -29.458
+TNS   : -14556.253
+
+Type  : Fast Model Setup 'vga_controller:VGACONT|clk_25mhz'
+Slack : -29.114
+TNS   : -4871.132
+
+Type  : Fast Model Setup 'CLOCK_50'
+Slack : -27.792
+TNS   : -24207.384
+
+Type  : Fast Model Hold 'CLOCK_50'
+Slack : -1.720
+TNS   : -3.440
+
+Type  : Fast Model Hold 'counter_div_clk[2]'
+Slack : 0.215
+TNS   : 0.000
+
+Type  : Fast Model Hold 'vga_controller:VGACONT|clk_25mhz'
+Slack : 0.215
+TNS   : 0.000
+
+Type  : Fast Model Minimum Pulse Width 'counter_div_clk[2]'
+Slack : -1.627
+TNS   : -2363.962
+
+Type  : Fast Model Minimum Pulse Width 'vga_controller:VGACONT|clk_25mhz'
+Slack : -1.627
+TNS   : -1250.012
+
+Type  : Fast Model Minimum Pulse Width 'CLOCK_50'
+Slack : -1.380
+TNS   : -4255.380
+
+------------------------------------------------------------
