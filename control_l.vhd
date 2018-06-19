@@ -109,21 +109,18 @@ BEGIN
 						OR operation(9 DOWNTO 5) = "01111" ELSE
 					  '1';
 				
-	wrd_gp_fp <= '1' WHEN ir(15 DOWNTO 12) = "1001" OR ir(15 DOWNTO 12) = "1011" ELSE --OP/CMP FP or LDF
+	wrd_gp_fp <= '1' WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT OR ir(15 DOWNTO 12) = LD_FLOAT ELSE --OP/CMP FP or LDF
 					 '0';
 	
 	d_sys <= '1' WHEN ir(15 DOWNTO 12) = "1111" AND ir(5 DOWNTO 0) = "110000" ELSE
 	         '0';
 	
-	sel_br <= "10" WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT OR ir(15 DOWNTO 12) = ST_FLOAT ELSE --BRfp
+	sel_br <= "10" WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT ELSE --OR ir(15 DOWNTO 12) = ST_FLOAT ELSE --BRfp
 				 "01" WHEN ir(15 DOWNTO 12) = "1111" AND (ir(5 DOWNTO 0) = "101100" OR ir(5 DOWNTO 0) = "100100") ELSE --BRsys
 				 "00"; --BRint
 				 
-	b_br <= '1' WHEN ir(15 DOWNTO 12) = "1001" OR ir(15 DOWNTO 12) = "1100" ELSE --OP/CMP FP or STF
+	b_br <= '1' WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT OR ir(15 DOWNTO 12) = ST_FLOAT ELSE --OP/CMP FP or STF
 			  '0';
-				 
---	a_sys <= '1' WHEN ir(15 DOWNTO 12) = "1111" AND (ir(5 DOWNTO 0) = "101100" OR ir(5 DOWNTO 0) = "100100") ELSE
---	         '0';
  
 	reti        <= '1' WHEN ir(15 DOWNTO 0) = x"F024" ELSE '0';
  
@@ -137,9 +134,9 @@ BEGIN
  
  
 	addr_b <= ir(11 DOWNTO 9) WHEN ir(15 DOWNTO 12) = "0100" OR ir(15 DOWNTO 12) = "0110" OR ir(15 DOWNTO 12) = "0111" 
-					OR ir(15 DOWNTO 12) = "1010" OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0111" 
-					OR ir(15 DOWNTO 12) = "1111" OR ir(15 DOWNTO 12) = "1100" ELSE
-			  ir(2 DOWNTO 0);
+						OR ir(15 DOWNTO 12) = "1010" OR ir(15 DOWNTO 12) = "1110"
+						OR ir(15 DOWNTO 12) = "1111" OR ir(15 DOWNTO 12) = ST_FLOAT ELSE
+				 ir(2 DOWNTO 0);
  
 	addr_d <= ir(11 DOWNTO 9);
  
@@ -167,8 +164,8 @@ BEGIN
 	        '0' WHEN OTHERS;
  
 	in_d <= "11" WHEN ir(15 DOWNTO 12) = "0111" OR (ir(15 DOWNTO 12) = x"F" AND ir(5 DOWNTO 0) = "101000") ELSE --IN or GETTID
-	        "10" WHEN ir(15 DOWNTO 12) = "1010" AND ir(2 downto 0) = "100" ELSE --PC
-	        "01" WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "1101" ELSE --MEM
+	        "10" WHEN ir(15 DOWNTO 12) = "1010" AND ir(2 downto 0) = "100" 		ELSE --PC
+	        "01" WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "1101" 	ELSE --MEM
 	        "00"; --ALU
  
 	immed_x2 <= '1' WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "0100" ELSE
