@@ -165,14 +165,15 @@ begin
 	        inmediato when "0100", 
 	        inmediato when "1101", 
 	        inmediato when "1110", 
-	        inmediato when "0101", 
+	        inmediato when "0101",
+			  inmediato when "1011",
+			  inmediato when "1100", 
 			  b_GP_FP   when "1001",
 	        b_GP_INT 	when others;
 
 	jump_addr <= a_leer;
  
 	data_wr <= b_GP_INT WHEN sel_mem_dat = '0' ELSE
-	
 				  b_GP_FP; -- En memoria puede ir tanto un float como un INT
  
 	wr_io <= b_GP_INT;

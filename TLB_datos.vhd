@@ -88,7 +88,7 @@ BEGIN
         if boot = '1' then
             virtual(0) <= "0000"; 
             virtual(1) <= "0000";
-            virtual(2) <= "0000";
+            virtual(2) <= "0010";
             virtual(3) <= "0000";
             virtual(4) <= "1010";
             virtual(5) <= "1011";
@@ -97,7 +97,7 @@ BEGIN
             
             fisico(0) <= "110000"; 
             fisico(1) <= "000000"; 
-            fisico(2) <= "000000"; 
+            fisico(2) <= "100010"; 
             fisico(3) <= "000000"; 
             fisico(4) <= "101010"; 
             fisico(5) <= "101011"; 

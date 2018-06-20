@@ -146,14 +146,12 @@ BEGIN
  
 	WITH ir(15 DOWNTO 12) SELECT
 	immed <= std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "0010", 
-	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1011", 
-	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1100", 
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1101", 
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1110", 
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "0011", 
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "0100",
-				--std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1011", --LDF
-				--std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1100", --STF
+				std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1011", --LDF
+				std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1100", --STF
 	         std_logic_vector(resize(signed(ir(7 DOWNTO 0)), immed'length)) WHEN OTHERS;
  
  
@@ -165,10 +163,10 @@ BEGIN
  
 	in_d <= "11" WHEN ir(15 DOWNTO 12) = "0111" OR (ir(15 DOWNTO 12) = x"F" AND ir(5 DOWNTO 0) = "101000") ELSE --IN or GETTID
 	        "10" WHEN ir(15 DOWNTO 12) = "1010" AND ir(2 downto 0) = "100" 		ELSE --PC
-	        "01" WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "1101" 	ELSE --MEM
+	        "01" WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "1101" OR ir(15 downto 0) = LD_FLOAT ELSE --MEM
 	        "00"; --ALU
  
-	immed_x2 <= '1' WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "0100" ELSE
+	immed_x2 <= '1' WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "0100" OR ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" ELSE
 	            '0';
  
 	WITH ir(15 DOWNTO 12) SELECT
