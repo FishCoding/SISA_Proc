@@ -161,9 +161,9 @@ BEGIN
 			  '1' WHEN "1100", --STF
 	        '0' WHEN OTHERS;
  
-	in_d <= "11" WHEN ir(15 DOWNTO 12) = "0111" OR (ir(15 DOWNTO 12) = x"F" AND ir(5 DOWNTO 0) = "101000") ELSE --IN or GETTID
+	in_d <= "11" WHEN ir(15 DOWNTO 12) = "0111" OR (ir(15 DOWNTO 12) = "1111" AND ir(5 DOWNTO 0) = "101000") ELSE --IN or GETTID
 	        "10" WHEN ir(15 DOWNTO 12) = "1010" AND ir(2 downto 0) = "100" 		ELSE --PC
-	        "01" WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "1101" OR ir(15 downto 0) = LD_FLOAT ELSE --MEM
+	        "01" WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "1101" OR ir(15 downto 12) = LD_FLOAT ELSE --MEM
 	        "00"; --ALU
  
 	immed_x2 <= '1' WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "0100" OR ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" ELSE
