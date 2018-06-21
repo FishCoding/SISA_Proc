@@ -155,7 +155,7 @@ BEGIN
 							  
 	add_sub_fp_inst : add_sub_fp 
 	PORT MAP (
-		add_sub	 => op(0),
+		add_sub	 => NOT(op(0)),
 		clock	 => clk,
 		dataa	 => a(15) & a_exponent_input & a_mantissa_input,
 		datab	 => b(15) & b_exponent_input & b_mantissa_input,

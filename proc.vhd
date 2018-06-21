@@ -7,6 +7,7 @@ ENTITY proc IS
 	(
 		boot      : IN STD_LOGIC;
 		clk       : IN STD_LOGIC;
+		clk_50       : IN STD_LOGIC;
 		datard_m  : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 		addr_m    : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 		wr_m      : OUT STD_LOGIC;
@@ -60,6 +61,7 @@ ARCHITECTURE Structure OF proc IS
 		PORT 
 		(
 			clk              : IN STD_LOGIC;
+			clk_50              : IN STD_LOGIC;
 			op               : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
 		   wrd_gp_int 		  : IN STD_LOGIC;
 		   wrd_gp_fp        : IN STD_LOGIC;
@@ -329,7 +331,7 @@ BEGIN
 	PORT MAP
 	(
 		boot          => boot, 
-		clk           => clk, 
+		clk           => clk,
 		datard_m      => datard_m, 
 		op            => op_signal, 
 		wrd_gp_int    => wrd_int_signal, 
@@ -377,7 +379,8 @@ BEGIN
 	datapath0 : datapath
 	PORT MAP
 	(
-		clk              => clk, 
+		clk              => clk,
+		clk_50        => clk_50,	
 		op               => op_signal, 
 		wrd_gp_fp        => wrd_fp_signal, 
 		wrd_gp_int		  => wrd_int_signal,

@@ -89,6 +89,7 @@ end component;
 component proc IS
     PORT (boot     : IN  STD_LOGIC;
           clk      : IN  STD_LOGIC;
+          clk_50      : IN  STD_LOGIC;
           datard_m : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
           addr_m   : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 wr_m : OUT STD_LOGIC;
@@ -175,6 +176,7 @@ divisor_clk_3125 : PROCESS(CLOCK_50)
 proc0: proc
 port map(boot => boot_s,
 			clk => clk_3125,
+			clk_50 => CLOCK_50,
 			datard_m => datard_signal,
 			addr_m => addr_m_s,
 			wr_m => wr_m_s,

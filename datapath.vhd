@@ -5,6 +5,7 @@ use ieee.numeric_std.all;
 entity datapath is
 	port (
 		clk : in STD_LOGIC;
+		clk_50 : in STD_LOGIC;
 		op : in STD_LOGIC_VECTOR(9 downto 0);
 		wrd_gp_int : in STD_LOGIC;
 		wrd_gp_fp  : in STD_LOGIC;
@@ -255,7 +256,7 @@ begin
       w  => salida_alu_fp,
 		invalid_division => exc_invalid_division,
 		overflow => overflow_signal,
-		clk => clk
+		clk => clk_50
 	); 
 	
 	overflow_fp <= overflow_signal;
