@@ -106,7 +106,8 @@ BEGIN
  
 	wrd_gp_int <= '0' WHEN (ir(15 DOWNTO 12) = "1111" AND ir(4 DOWNTO 0) /= "01100" AND ir(4 DOWNTO 0) /= "01000") OR ir(15 DOWNTO 12) = "0100" 
 						OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0110" OR operation(9 DOWNTO 5) = "10100" 
-						OR operation(9 DOWNTO 5) = "01111" ELSE
+						OR operation(9 DOWNTO 5) = "01111"  OR ir(15 DOWNTO 12) = "1001" OR ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" ELSE
+					  
 					  '1';
 				
 	wrd_gp_fp <= '1' WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT OR ir(15 DOWNTO 12) = LD_FLOAT ELSE --OP/CMP FP or LDF

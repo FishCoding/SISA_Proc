@@ -191,6 +191,8 @@ BEGIN
 						     '0';
 	overflow <= overflow_sig when op(6 downto 0) = "1001000" or op(6 downto 0) = "1001001" else --ADDF y SUBF
 					'0';
+	
+	
 	w <= salida;
 	 
 END Structure;
