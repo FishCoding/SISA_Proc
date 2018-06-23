@@ -105,12 +105,18 @@ BEGIN
 	addr_io <= ir(7 DOWNTO 0);
  
 	wrd_gp_int <= '0' WHEN (ir(15 DOWNTO 12) = "1111" AND ir(4 DOWNTO 0) /= "01100" AND ir(4 DOWNTO 0) /= "01000") OR ir(15 DOWNTO 12) = "0100" 
-						OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0110" OR operation(9 DOWNTO 5) = "10100" 
-						OR operation(9 DOWNTO 5) = "01111"  OR ir(15 DOWNTO 12) = "1001" OR ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" ELSE
+						OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0110" OR operation(9 DOWNTO 5) = "10100" OR operation(9 DOWNTO 5) = "01111"  
+						OR (ir(15 DOWNTO 12) = "1001" AND ir(5 DOWNTO 3) = "000") OR (ir(15 DOWNTO 12) = "1001" AND ir(5 DOWNTO 3) = "001")
+					   OR (ir(15 DOWNTO 12) = "1001" AND ir(5 DOWNTO 3) = "010") OR (ir(15 DOWNTO 12) = "1001" AND ir(5 DOWNTO 3) = "011")	
+						OR ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" ELSE
 					  
 					  '1';
 				
-	wrd_gp_fp <= '1' WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT OR ir(15 DOWNTO 12) = LD_FLOAT ELSE --OP/CMP FP or LDF
+	wrd_gp_fp <= '1' WHEN (ir(15 DOWNTO 12) = OP_COMP_FLOAT AND ir(5 DOWNTO 3) = "000") OR --ADDF
+								 (ir(15 DOWNTO 12) = OP_COMP_FLOAT AND ir(5 DOWNTO 3) = "001") OR --SUBF
+								 (ir(15 DOWNTO 12) = OP_COMP_FLOAT AND ir(5 DOWNTO 3) = "010") OR --MULF
+								 (ir(15 DOWNTO 12) = OP_COMP_FLOAT AND ir(5 DOWNTO 3) = "011") OR --DIVF
+								  ir(15 DOWNTO 12) = LD_FLOAT ELSE --LDF
 					 '0';
 	
 	d_sys <= '1' WHEN ir(15 DOWNTO 12) = "1111" AND ir(5 DOWNTO 0) = "110000" ELSE
