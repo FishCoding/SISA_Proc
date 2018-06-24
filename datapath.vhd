@@ -104,6 +104,22 @@ architecture Structure of datapath is
 		);
 	end component;
 
+	component regfile_simd IS
+    PORT (clk    : IN  STD_LOGIC;
+          wrd0   : IN  STD_LOGIC;
+          wrd1   : IN  STD_LOGIC;
+          wrd2   : IN  STD_LOGIC;
+          wrd3   : IN  STD_LOGIC;
+          d0     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+          d1     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+          d2     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+          d3     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+          r0     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+          r1     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+          r2     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+		  r3     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+	END component;
+
 	signal salida_alu : std_LOGIC_VECTOR(15 downto 0);
 	signal salida_alu_fp : STD_LOGIC_VECTOR (15 downto 0);
 	signal salida_alu_int : STD_LOGIC_VECTOR (15 downto 0);
@@ -127,6 +143,16 @@ architecture Structure of datapath is
 
 	signal overflow_signal 			 : std_logic;
 	signal exc_invalid_division : std_logic;
+
+	--Signals SIMD
+	signal r0_simd : std_logic_vector(15 downto 0);
+	signal r1_simd : std_logic_vector(15 downto 0);
+	signal r2_simd : std_logic_vector(15 downto 0);
+	signal r3_simd : std_logic_vector(15 downto 0);
+	signal d0_simd : std_logic_vector(15 downto 0);
+	signal d1_simd : std_logic_vector(15 downto 0);
+	signal d2_simd : std_logic_vector(15 downto 0);
+	signal d3_simd : std_logic_vector(15 downto 0);
 
 begin
 
@@ -212,6 +238,23 @@ begin
 		a => a_GP_FP,
 		addr_b => addr_b,
 		b => b_GP_FP
+	);
+
+	regGeneralPurposeSIMD : regfile_simd
+    PORT map (
+		clk    => clk,
+        wrd0   => wrd_simd(0),
+        wrd1   => wrd_simd(1),
+		wrd2   => wrd_simd(2),
+        wrd3   => wrd_simd(3),
+        d0     => d0_simd,
+        d1     => d1_simd,
+        d2     => d2_simd,
+        d3     => d3_simd,
+        r0     => r0_simd,
+        r1     => r1_simd,
+        r2     => r2_simd,
+		r3     => r3_simd,
 	);
 	
 	regS : system_regfile

@@ -157,8 +157,8 @@ BEGIN
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1110", 
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "0011", 
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "0100",
-				std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1011", --LDF
-				std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1100", --STF
+			 std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1011", --LDF
+			 std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1100", --STF
 	         std_logic_vector(resize(signed(ir(7 DOWNTO 0)), immed'length)) WHEN OTHERS;
  
  
