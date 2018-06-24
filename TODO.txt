@@ -3,11 +3,11 @@
   aprofitarem per fer SUMA i RESTA de 2 words a la vegada(fer servir els 4 regs) i fer SUMA
   i RESTA de 2 bytes (la meitat dels regs) i de 4 bytes (tots els regs) a la vegada
 
-- S'ha d'implementar el banc de SIMD. Tindrà 4 registres de 16 bits, 4 ports de lectura i 2 
-  d'escriptura
+- S'ha d'implementar el banc de SIMD. Tindrà 4 registres de 16 bits, 4 ports de lectura i 4 
+  d'escriptura (per simplicitat, només utilitzarem 2 simultaniament).
 
 - Implementar operacions de load i store d'aquests registres. Codifciació proposada:
-  1111 | Immed 6 bits | 0 | 0/1 (0 load | 1 store) | SIMDd/b (load/store) 2 bits | SIMDa 2 bits
+  1111 | 0/1 (0 load | 1 store) | SIMDd/b (load/store) 2 bits | Ra 3 bits | 0 | Immed 5 bits
   Por produir excpeció de direcció mal alineada i de memòria protegida
 
 - Implementar les operacions ADD i SUB. Codificació proposada:
