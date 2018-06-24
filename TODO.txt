@@ -1,0 +1,18 @@
+- S'implementaran operacions de SUMA i RESTA SIMD, amb words (16 bits) i bytes (8 bits) 
+  Per fer una suma SIMD de 16 bits el mínim necessari són 4 registres de 16bits, així que
+  aprofitarem per fer SUMA i RESTA de 2 words a la vegada(fer servir els 4 regs) i fer SUMA
+  i RESTA de 2 bytes (la meitat dels regs) i de 4 bytes (tots els regs) a la vegada
+
+- S'ha d'implementar el banc de SIMD. Tindrà 4 registres de 16 bits, 4 ports de lectura i 2 
+  d'escriptura
+
+- Implementar operacions de load i store d'aquests registres. Codifciació proposada:
+  1111 | Immed 6 bits | 0 | 0/1 (0 load | 1 store) | SIMDd/b (load/store) 2 bits | SIMDa 2 bits
+  Por produir excpeció de direcció mal alineada i de memòria protegida
+
+- Implementar les operacions ADD i SUB. Codificació proposada:
+  1010 | 000000 | 1 | 0/1 (0 ADD 1 SUB) | 00 | 00 - Word   01 - 2 Bytes   10 - 4 Bytes
+  En Word es fa R1 +- R3 i R2 +- R4, els resultats queden a R1 i R2
+  En 2 Bytes es fa R1 +- R2, els resultats queden a R1
+  En 4 Bytes es fa R1 +- R3 i R2 +- R4, els resultats queden a R1 i R2
+  En cap cas es comproba Overflow ni es produeixen excepcions
