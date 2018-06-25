@@ -42,40 +42,10 @@ set_global_assignment -name TOP_LEVEL_ENTITY sisa
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION "13.0 SP1"
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "13:03:26  JUNE 01, 2018"
 set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
-set_global_assignment -name VHDL_FILE vga_sync.vhd
-set_global_assignment -name VHDL_FILE vga_ram_dual.vhd
-set_global_assignment -name VHDL_FILE vga_font_rom.vhd
-set_global_assignment -name VHDL_FILE vga_controller.vhd
-set_global_assignment -name VHDL_FILE unidad_control.vhd
-set_global_assignment -name VHDL_FILE TLB_instr.vhd
-set_global_assignment -name VHDL_FILE TLB_datos.vhd
-set_global_assignment -name VHDL_FILE timer.vhd
-set_global_assignment -name VHDL_FILE system_regfile.vhd
-set_global_assignment -name VHDL_FILE SRAMController.vhd
-set_global_assignment -name VHDL_FILE sisa.vhd
-set_global_assignment -name VHDL_FILE regfile.vhd
-set_global_assignment -name VHDL_FILE pulsadores.vhd
-set_global_assignment -name VHDL_FILE ps2_keyboard.vhd
-set_global_assignment -name VHDL_FILE proc.vhd
-set_global_assignment -name VHDL_FILE multi.vhd
-set_global_assignment -name VHDL_FILE MemoryController.vhd
-set_global_assignment -name VHDL_FILE keyboard_controller.vhd
-set_global_assignment -name VHDL_FILE interrupt_controller.vhd
-set_global_assignment -name VHDL_FILE interruptores.vhd
-set_global_assignment -name VHDL_FILE generador_reloj.vhd
-set_global_assignment -name VHDL_FILE exception_controller.vhd
-set_global_assignment -name VHDL_FILE driver7segmentos.vhd
-set_global_assignment -name VHDL_FILE datapath.vhd
-set_global_assignment -name VHDL_FILE control_l.vhd
-set_global_assignment -name VHDL_FILE controladores_IO.vhd
-set_global_assignment -name VHDL_FILE alu.vhd
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
-set_global_assignment -name VHDL_FILE alu_fp.vhd
-set_global_assignment -name QIP_FILE mult.qip
-set_global_assignment -name QIP_FILE div.qip
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
@@ -524,10 +494,8 @@ set_location_assignment PIN_Y7 -to SRAM_LB_N
 set_location_assignment PIN_T8 -to SRAM_OE_N
 set_location_assignment PIN_W7 -to SRAM_UB_N
 set_location_assignment PIN_AA10 -to SRAM_WE_N
-set_global_assignment -name QIP_FILE cmp.qip
 set_global_assignment -name ENABLE_SIGNALTAP ON
 set_global_assignment -name USE_SIGNALTAP_FILE output_files/stp1.stp
-set_global_assignment -name SIGNALTAP_FILE output_files/stp1.stp
 set_global_assignment -name SLD_NODE_CREATOR_ID 110 -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_ENTITY_NAME sld_signaltap -section_id auto_signaltap_0
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_clk -to CLOCK_50 -section_id auto_signaltap_0
@@ -546,7 +514,6 @@ set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_LEVEL_PIP
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ENABLE_ADVANCED_TRIGGER=0" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SEGMENT_SIZE=512" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SAMPLE_DEPTH=512" -section_id auto_signaltap_0
-set_global_assignment -name QIP_FILE sub.qip
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[0] -to "MemoryController:MemController|SRAM_ADDR[0]" -section_id auto_signaltap_0
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[1] -to "MemoryController:MemController|SRAM_ADDR[10]" -section_id auto_signaltap_0
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[2] -to "MemoryController:MemController|SRAM_ADDR[11]" -section_id auto_signaltap_0
@@ -653,7 +620,6 @@ set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[49] -t
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[50] -to "MemoryController:MemController|wr_data[9]" -section_id auto_signaltap_0
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[51] -to "proc:proc0|boot" -section_id auto_signaltap_0
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[52] -to "proc:proc0|clk" -section_id auto_signaltap_0
-set_global_assignment -name QIP_FILE add.qip
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[53] -to "proc:proc0|datapath:datapath0|alu_fp:aluFP|cmp:cmp_inst|alb" -section_id auto_signaltap_0
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[54] -to "proc:proc0|datapath:datapath0|alu_fp:aluFP|cmp:cmp_inst|dataa[0]" -section_id auto_signaltap_0
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[55] -to "proc:proc0|datapath:datapath0|alu_fp:aluFP|cmp:cmp_inst|dataa[10]" -section_id auto_signaltap_0
@@ -969,4 +935,42 @@ set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INVERSION_MASK_LE
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_NODE_CRC_LOWORD=1401" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_NODE_CRC_HIWORD=47782" -section_id auto_signaltap_0
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name VHDL_FILE simd_regfile.vhd
+set_global_assignment -name VHDL_FILE alu_simd.vhd
+set_global_assignment -name VHDL_FILE vga_sync.vhd
+set_global_assignment -name VHDL_FILE vga_ram_dual.vhd
+set_global_assignment -name VHDL_FILE vga_font_rom.vhd
+set_global_assignment -name VHDL_FILE vga_controller.vhd
+set_global_assignment -name VHDL_FILE unidad_control.vhd
+set_global_assignment -name VHDL_FILE TLB_instr.vhd
+set_global_assignment -name VHDL_FILE TLB_datos.vhd
+set_global_assignment -name VHDL_FILE timer.vhd
+set_global_assignment -name VHDL_FILE system_regfile.vhd
+set_global_assignment -name VHDL_FILE SRAMController.vhd
+set_global_assignment -name VHDL_FILE sisa.vhd
+set_global_assignment -name VHDL_FILE regfile.vhd
+set_global_assignment -name VHDL_FILE pulsadores.vhd
+set_global_assignment -name VHDL_FILE ps2_keyboard.vhd
+set_global_assignment -name VHDL_FILE proc.vhd
+set_global_assignment -name VHDL_FILE multi.vhd
+set_global_assignment -name VHDL_FILE MemoryController.vhd
+set_global_assignment -name VHDL_FILE keyboard_controller.vhd
+set_global_assignment -name VHDL_FILE interrupt_controller.vhd
+set_global_assignment -name VHDL_FILE interruptores.vhd
+set_global_assignment -name VHDL_FILE generador_reloj.vhd
+set_global_assignment -name VHDL_FILE exception_controller.vhd
+set_global_assignment -name VHDL_FILE driver7segmentos.vhd
+set_global_assignment -name VHDL_FILE datapath.vhd
+set_global_assignment -name VHDL_FILE control_l.vhd
+set_global_assignment -name VHDL_FILE controladores_IO.vhd
+set_global_assignment -name VHDL_FILE alu.vhd
+set_global_assignment -name VHDL_FILE alu_fp.vhd
+set_global_assignment -name QIP_FILE mult.qip
+set_global_assignment -name QIP_FILE div.qip
+set_global_assignment -name QIP_FILE cmp.qip
+set_global_assignment -name SIGNALTAP_FILE output_files/stp1.stp
+set_global_assignment -name QIP_FILE sub.qip
+set_global_assignment -name QIP_FILE add.qip
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name SLD_FILE "C:/Users/pec03/Desktop/PEC/SISA_Proc/output_files/stp1_auto_stripped.stp"
