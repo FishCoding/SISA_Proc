@@ -115,6 +115,7 @@ signal b : std_logic_vector (15 downto 0);
 
  
 signal salida : std_logic_vector(15 downto 0); 
+signal invalid_division_s : std_logic;
  
 BEGIN 
    
@@ -192,7 +193,7 @@ BEGIN
 	overflow_mult <= '1' when mult_s(30 downto 23) > x"9E" and op(6 downto 0) = "1001010" else
 						 '0';
 	
-	overflow_div <= '1' when div_s(30 downto 23) > x"9E" and op(6 downto 0) = "1001011" else
+	overflow_div <= '1' when div_s(30 downto 23) > x"9E" and op(6 downto 0) = "1001011" and invalid_division_s = '0' else
 						 '0';
 						 
 	with op(2 downto 0) select
@@ -242,9 +243,10 @@ BEGIN
 		alb	 => cmplt_s
 	);
 	
-	invalid_division <= '1' when op(6 downto 0) = "1001011" and (y = "0000000000000000" or y = "1000000000000000") else
+	invalid_division_s <= '1' when op(6 downto 0) = "1001011" and (y = "0000000000000000" or y = "1000000000000000") else
 						     '0';
 	
+	invalid_division <= invalid_division_s;
 	
 	w <= salida;
 	 

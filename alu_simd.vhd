@@ -9,7 +9,7 @@ ENTITY alu_simd IS
           a2 : IN  STD_LOGIC_VECTOR(15 DOWNTO 0); 
           a3 : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
           op : IN  STD_LOGIC_VECTOR(2 DOWNTO 0); --Bit 2 ADD/SUB, Bits 1 i 0: 00 Word, 01 2Bytes, 10 4Bytes 
-          w0  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+          w0  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           w1  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 		  ); 
 END alu_simd; 

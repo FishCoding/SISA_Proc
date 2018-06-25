@@ -186,7 +186,7 @@ BEGIN
 --			  '1' WHEN 
 --	        '0' WHEN OTHERS;
 
-   wr_m <= '1' WHEN ir(15 DOWNTO 12) = "0100" OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "1110" OR --ST/STB/STF
+   wr_m <= '1' WHEN ir(15 DOWNTO 12) = "0100" OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "1100" OR --ST/STB/STF
 						  (ir(15 DOWNTO 11) = "11111" AND ir(5) = '0')  ELSE --simd_ST
 			  '0';
  
