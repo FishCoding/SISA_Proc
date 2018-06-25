@@ -1,5 +1,5 @@
 Assembler report for sisa
-Fri Jun 22 16:05:47 2018
+Mon Jun 25 17:05:47 2018
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
 
 
@@ -11,8 +11,8 @@ Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edit
   3. Assembler Settings
   4. Assembler Encrypted IP Cores Summary
   5. Assembler Generated Files
-  6. Assembler Device Options: C:/Users/pec03/Desktop/SISA/SISA_Proc/output_files/sisa.sof
-  7. Assembler Device Options: C:/Users/pec03/Desktop/SISA/SISA_Proc/output_files/sisa.pof
+  6. Assembler Device Options: C:/Users/pec03/Desktop/PEC/SISA_Proc/output_files/sisa.sof
+  7. Assembler Device Options: C:/Users/pec03/Desktop/PEC/SISA_Proc/output_files/sisa.pof
   8. Assembler Messages
 
 
@@ -39,7 +39,7 @@ applicable agreement for further details.
 +---------------------------------------------------------------+
 ; Assembler Summary                                             ;
 +-----------------------+---------------------------------------+
-; Assembler Status      ; Successful - Fri Jun 22 16:05:47 2018 ;
+; Assembler Status      ; Successful - Mon Jun 25 17:05:47 2018 ;
 ; Revision Name         ; sisa                                  ;
 ; Top-level Entity Name ; sisa                                  ;
 ; Family                ; Cyclone II                            ;
@@ -89,37 +89,37 @@ applicable agreement for further details.
 +--------+------------------------+--------------+
 
 
-+-------------------------------------------------------------+
-; Assembler Generated Files                                   ;
-+-------------------------------------------------------------+
-; File Name                                                   ;
-+-------------------------------------------------------------+
-; C:/Users/pec03/Desktop/SISA/SISA_Proc/output_files/sisa.sof ;
-; C:/Users/pec03/Desktop/SISA/SISA_Proc/output_files/sisa.pof ;
-+-------------------------------------------------------------+
++------------------------------------------------------------+
+; Assembler Generated Files                                  ;
++------------------------------------------------------------+
+; File Name                                                  ;
++------------------------------------------------------------+
+; C:/Users/pec03/Desktop/PEC/SISA_Proc/output_files/sisa.sof ;
+; C:/Users/pec03/Desktop/PEC/SISA_Proc/output_files/sisa.pof ;
++------------------------------------------------------------+
 
 
-+---------------------------------------------------------------------------------------+
-; Assembler Device Options: C:/Users/pec03/Desktop/SISA/SISA_Proc/output_files/sisa.sof ;
-+----------------+----------------------------------------------------------------------+
-; Option         ; Setting                                                              ;
-+----------------+----------------------------------------------------------------------+
-; Device         ; EP2C20F484C7                                                         ;
-; JTAG usercode  ; 0x00AE6C30                                                           ;
-; Checksum       ; 0x00AE6C30                                                           ;
-+----------------+----------------------------------------------------------------------+
++--------------------------------------------------------------------------------------+
+; Assembler Device Options: C:/Users/pec03/Desktop/PEC/SISA_Proc/output_files/sisa.sof ;
++----------------+---------------------------------------------------------------------+
+; Option         ; Setting                                                             ;
++----------------+---------------------------------------------------------------------+
+; Device         ; EP2C20F484C7                                                        ;
+; JTAG usercode  ; 0x00B5402C                                                          ;
+; Checksum       ; 0x00B5402C                                                          ;
++----------------+---------------------------------------------------------------------+
 
 
-+---------------------------------------------------------------------------------------+
-; Assembler Device Options: C:/Users/pec03/Desktop/SISA/SISA_Proc/output_files/sisa.pof ;
-+--------------------+------------------------------------------------------------------+
-; Option             ; Setting                                                          ;
-+--------------------+------------------------------------------------------------------+
-; Device             ; EPCS16                                                           ;
-; JTAG usercode      ; 0x00000000                                                       ;
-; Checksum           ; 0x1D275EBF                                                       ;
-; Compression Ratio  ; 1                                                                ;
-+--------------------+------------------------------------------------------------------+
++--------------------------------------------------------------------------------------+
+; Assembler Device Options: C:/Users/pec03/Desktop/PEC/SISA_Proc/output_files/sisa.pof ;
++--------------------+-----------------------------------------------------------------+
+; Option             ; Setting                                                         ;
++--------------------+-----------------------------------------------------------------+
+; Device             ; EPCS16                                                          ;
+; JTAG usercode      ; 0x00000000                                                      ;
+; Checksum           ; 0x1D1DAF14                                                      ;
+; Compression Ratio  ; 1                                                               ;
++--------------------+-----------------------------------------------------------------+
 
 
 +--------------------+
@@ -128,13 +128,13 @@ applicable agreement for further details.
 Info: *******************************************************************
 Info: Running Quartus II 64-Bit Assembler
     Info: Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
-    Info: Processing started: Fri Jun 22 16:05:45 2018
+    Info: Processing started: Mon Jun 25 17:05:45 2018
 Info: Command: quartus_asm --read_settings_files=off --write_settings_files=off sisa -c sisa
 Info (115031): Writing out detailed assembly data for power analysis
 Info (115030): Assembler is generating device programming files
 Info: Quartus II 64-Bit Assembler was successful. 0 errors, 0 warnings
-    Info: Peak virtual memory: 467 megabytes
-    Info: Processing ended: Fri Jun 22 16:05:47 2018
+    Info: Peak virtual memory: 471 megabytes
+    Info: Processing ended: Mon Jun 25 17:05:47 2018
     Info: Elapsed time: 00:00:02
     Info: Total CPU time (on all processors): 00:00:02
 
