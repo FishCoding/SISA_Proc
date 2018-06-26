@@ -79,7 +79,7 @@ BEGIN
              fisico(7) ;--x"7";
 
     v <= not dir_f(5);
-    r <= not dir_f(4);
+    r <= dir_f(4);
     ptag <= dir_f(3 downto 0);
 
 

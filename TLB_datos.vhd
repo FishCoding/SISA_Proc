@@ -79,7 +79,7 @@ BEGIN
              fisico(7) ;--x"7";
 
     v <= not dir_f(5);
-    r <= not dir_f(4);
+    r <= dir_f(4);
     ptag <= dir_f(3 downto 0);
 
 
@@ -87,17 +87,17 @@ BEGIN
      begin
         if boot = '1' then
             virtual(0) <= "0000"; 
-            virtual(1) <= "0000";
-            virtual(2) <= "0000";
+            virtual(1) <= "0001";
+            virtual(2) <= "1000";
             virtual(3) <= "0000";
             virtual(4) <= "1010";
             virtual(5) <= "1011";
             virtual(6) <= "0010";
             virtual(7) <= "0011"; -- PILA SYS 
             
-            fisico(0) <= "110000"; 
-            fisico(1) <= "000000"; 
-            fisico(2) <= "000000"; 
+            fisico(0) <= "100000"; 
+            fisico(1) <= "100001"; 
+            fisico(2) <= "101000"; 
             fisico(3) <= "000000"; 
             fisico(4) <= "101010"; 
             fisico(5) <= "101011"; 

@@ -4,7 +4,7 @@ JedecChain;
 	DefaultMfr(6E);
 
 	P ActionCode(Cfg)
-		Device PartName(EP2C20F484) Path("C:/Users/pec03/Desktop/PEC/SISA_Proc/output_files/") File("DE1_USB_API.sof") MfrSpec(OpMask(1));
+		Device PartName(EP2C20F484) Path("C:/Users/pec03/Desktop/PEC/SISA_Proc/output_files/") File("sisa.sof") MfrSpec(OpMask(1));
 
 ChainEnd;
 

@@ -1,5 +1,5 @@
 TimeQuest Timing Analyzer report for sisa
-Tue Jun 26 13:24:47 2018
+Tue Jun 26 16:18:04 2018
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
 
 
@@ -232,7 +232,7 @@ No dedicated SERDES Receiver circuitry present in device or used in design
 ; Illegal Clocks                  ; 0     ; 0     ;
 ; Unconstrained Clocks            ; 3     ; 3     ;
 ; Unconstrained Input Ports       ; 31    ; 31    ;
-; Unconstrained Input Port Paths  ; 1466  ; 1466  ;
+; Unconstrained Input Port Paths  ; 1552  ; 1552  ;
 ; Unconstrained Output Ports      ; 95    ; 95    ;
 ; Unconstrained Output Port Paths ; 17973 ; 17973 ;
 +---------------------------------+-------+-------+
@@ -244,7 +244,7 @@ No dedicated SERDES Receiver circuitry present in device or used in design
 Info: *******************************************************************
 Info: Running Quartus II 64-Bit TimeQuest Timing Analyzer
     Info: Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
-    Info: Processing started: Tue Jun 26 13:24:44 2018
+    Info: Processing started: Tue Jun 26 16:18:02 2018
 Info: Command: quartus_sta sisa -c sisa
 Info: qsta_default_script.tcl version: #1
 Info (11104): Parallel Compilation has detected 8 hyper-threaded processors. However, the extra hyper-threaded processors will not be used by default. Parallel Compilation will use 4 of the 4 physical processors detected instead.
@@ -287,9 +287,9 @@ Info (332001): The selected device family is not supported by the report_metasta
 Info (332102): Design is not fully constrained for setup requirements
 Info (332102): Design is not fully constrained for hold requirements
 Info: Quartus II 64-Bit TimeQuest Timing Analyzer was successful. 0 errors, 8 warnings
-    Info: Peak virtual memory: 629 megabytes
-    Info: Processing ended: Tue Jun 26 13:24:47 2018
-    Info: Elapsed time: 00:00:03
+    Info: Peak virtual memory: 638 megabytes
+    Info: Processing ended: Tue Jun 26 16:18:04 2018
+    Info: Elapsed time: 00:00:02
     Info: Total CPU time (on all processors): 00:00:03
 
 
