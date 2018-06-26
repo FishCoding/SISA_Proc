@@ -10,6 +10,7 @@ entity datapath is
 		wrd_gp_int : in STD_LOGIC;
 		wrd_gp_fp  : in STD_LOGIC;
 		d_sys : in STD_LOGIC;
+		wrd_simd		     : IN STD_LOGIC_VECTOR(3 DOWNTO 0); --permis escriptura simdBR
 		sel_alu_w : IN STD_LOGIC;
 		sel_mem_dat	: IN STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
 		sel_br : in STD_LOGIC_VECTOR(1 downto 0);
@@ -104,7 +105,7 @@ architecture Structure of datapath is
 		);
 	end component;
 
-	component regfile_simd IS
+	component simd_regfile IS
     PORT (clk    : IN  STD_LOGIC;
           wrd0   : IN  STD_LOGIC;
           wrd1   : IN  STD_LOGIC;
@@ -240,12 +241,12 @@ begin
 		b => b_GP_FP
 	);
 
-	regGeneralPurposeSIMD : regfile_simd
+	regGeneralPurposeSIMD : simd_regfile
     PORT map (
 		clk    => clk,
         wrd0   => wrd_simd(0),
         wrd1   => wrd_simd(1),
-		wrd2   => wrd_simd(2),
+		  wrd2   => wrd_simd(2),
         wrd3   => wrd_simd(3),
         d0     => d0_simd,
         d1     => d1_simd,
@@ -254,7 +255,7 @@ begin
         r0     => r0_simd,
         r1     => r1_simd,
         r2     => r2_simd,
-		r3     => r3_simd,
+		  r3     => r3_simd
 	);
 	
 	regS : system_regfile

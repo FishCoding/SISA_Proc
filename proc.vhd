@@ -66,6 +66,7 @@ ARCHITECTURE Structure OF proc IS
 		   wrd_gp_int 		  : IN STD_LOGIC;
 		   wrd_gp_fp        : IN STD_LOGIC;
 			d_sys            : IN STD_LOGIC;
+			wrd_simd		     : IN STD_LOGIC_VECTOR(3 DOWNTO 0); --permis escriptura simdBR
 			sel_alu_w 		  : IN STD_LOGIC;
 			sel_mem_dat	  	  : IN STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
 			sel_br           : IN STD_LOGIC_VECTOR (1 DOWNTO 0);
@@ -126,6 +127,7 @@ ARCHITECTURE Structure OF proc IS
 			rd_in           : OUT STD_LOGIC;
 			wr_out          : OUT STD_LOGIC;
 			d_sys           : OUT STD_LOGIC; --permis escriptura sysBR
+			wrd_simd		    : OUT STD_LOGIC_VECTOR(3 DOWNTO 0); --permis escriptura simdBR
 			sel_br          : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
 			sel_mem_dat	    : OUT STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
 			b_br			    : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
@@ -215,11 +217,12 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL pc_signal_fancy    : std_logic_vector(15 downto 0);
 	SIGNAL in_d_signal        : std_logic_vector(1 DOWNTO 0);
 	SIGNAL tknbr_s            : std_logic_vector(1 DOWNTO 0);
- 
+	
 	SIGNAL jump_addr_s        : std_logic_vector(15 DOWNTO 0);
  
 	SIGNAL sel_br_s           : std_logic_vector (1 downto 0);
 	SIGNAL d_sys_s            : std_logic;
+	SIGNAL wrd_simd_s			  : STD_LOGIC_VECTOR(3 DOWNTO 0);
 	SIGNAL b_br_s             : std_logic;
 	SIGNAL sel_alu_s			  : std_logic;
 	SIGNAL sel_mem_dat_s		  : std_logic;
@@ -338,7 +341,8 @@ BEGIN
 		wrd_gp_fp	  => wrd_fp_signal,
 		sel_br        => sel_br_s,
 		sel_mem_dat	  => sel_mem_dat_s,
-		d_sys         => d_sys_s, 
+		d_sys         => d_sys_s,
+		wrd_simd 	  => wrd_simd_s,	
 		b_br 			  => b_br_s,
 		sel_alu_w	  => sel_alu_s,
 		addr_a        => addr_a_signal, 
@@ -387,7 +391,8 @@ BEGIN
 		sel_br           => sel_br_s,
 		sel_alu_w		  => sel_alu_s,
 		sel_mem_dat		  => sel_mem_dat_s,
-		d_sys            => d_sys_s, 
+		d_sys            => d_sys_s,
+		wrd_simd 	     => wrd_simd_s,
 		addr_a           => addr_a_signal, 
 		addr_d           => addr_d_signal, 
 		immed            => imed_signal, -- holy

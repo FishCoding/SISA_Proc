@@ -3,7 +3,7 @@ USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;        --Esta libreria sera necesaria si usais conversiones TO_INTEGER
 USE ieee.std_logic_unsigned.all; --Esta libreria sera necesaria si usais conversiones CONV_INTEGER
 
-ENTITY regfile_simd IS
+ENTITY simd_regfile IS
     PORT (clk    : IN  STD_LOGIC;
           wrd0   : IN  STD_LOGIC;
           wrd1   : IN  STD_LOGIC;
@@ -17,9 +17,9 @@ ENTITY regfile_simd IS
           r1     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           r2     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 		  r3     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
-END regfile_simd;
+END simd_regfile;
 
-ARCHITECTURE Structure OF regfile_simd IS
+ARCHITECTURE Structure OF simd_regfile IS
 	type Banco_Registros is array (3 downto 0) of std_logic_vector(15 downto 0);
 	signal BR : Banco_Registros ;
 
@@ -34,16 +34,16 @@ BEGIN
 		if rising_edge(clk) then
 			if wrd0='1' then
 				BR(0) <= d0;
-            end if;
-            if wrd1='1' then
+         end if;
+         if wrd1='1' then
 				BR(1) <= d1;
-            end if;
-            if wrd2='1' then
+         end if;
+         if wrd2='1' then
 				BR(2) <= d2;
-            end if;
-            if wrd0='1' then
+         end if;
+         if wrd3='1' then
 				BR(3) <= d3;
-            end if;
+         end if;
 		end if;
 	end process;
 	

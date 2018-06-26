@@ -9,6 +9,7 @@ ENTITY multi IS
 		ldpc_l    : IN STD_LOGIC;
 		wrd_gp_int_l : IN STD_LOGIC;
 		wrd_gp_fp_l : IN STD_LOGIC;
+		wrd_simd_l : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 		sel_br_l   : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
 		d_sys_l   : IN STD_LOGIC;
 		wr_m_l    : IN STD_LOGIC;
@@ -16,6 +17,7 @@ ENTITY multi IS
 		ldpc      : OUT STD_LOGIC;
 		wrd_gp_int : OUT STD_LOGIC;
 		wrd_gp_fp : OUT STD_LOGIC;
+		wrd_simd  : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
 		wr_m      : OUT STD_LOGIC;
 		ldir      : OUT STD_LOGIC;
 		ins_dad   : OUT STD_LOGIC;
@@ -72,6 +74,7 @@ BEGIN
 	        '0'; -- Load PC
 	wrd_gp_int <= wrd_gp_int_l WHEN estado_actual = DEMBOW and excepr='0' ELSE '0';
 	wrd_gp_fp  <= wrd_gp_fp_l WHEN estado_actual = DEMBOW and excepr='0' ELSE '0';
+	wrd_simd  <= wrd_simd_l WHEN estado_actual = DEMBOW and excepr='0' ELSE "0000";
 	word_byte <= w_b WHEN estado_actual = DEMBOW ELSE '0';
 	ins_dad   <= '1' WHEN estado_actual = DEMBOW ELSE '0';
 	ldir      <= '1' WHEN estado_actual = FETCH ELSE '0';

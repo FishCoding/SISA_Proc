@@ -30,6 +30,7 @@ ENTITY unidad_control IS
  
 		sel_br        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
 		d_sys         : OUT STD_LOGIC; --permis escriptura sysBR
+		wrd_simd		  : OUT STD_LOGIC_VECTOR(3 DOWNTO 0); --permis escriptura simdBR
 		b_br			  : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
 		sel_alu_w	  : OUT STD_LOGIC; --indica si hem de seleccionar la w de la ALU INT o FP
 		sel_mem_dat	  : OUT STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
@@ -84,6 +85,8 @@ ARCHITECTURE Structure OF unidad_control IS
 			rd_in         : OUT STD_LOGIC;
 			wr_out        : OUT STD_LOGIC;
 			low_ir        : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
+			
+			wrd_simd		  : OUT STD_LOGIC_VECTOR(3 DOWNTO 0); --permis escriptura simdBR
 
 			d_sys         : OUT STD_LOGIC; --permis escriptura sysBR
 			sel_br        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
@@ -114,6 +117,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			ldpc_l    : IN STD_LOGIC;
 			wrd_gp_int_l : IN STD_LOGIC;
 			wrd_gp_fp_l : IN STD_LOGIC;
+			wrd_simd_l : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 			sel_br_l   : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
 			d_sys_l   : IN STD_LOGIC;
 			wr_m_l    : IN STD_LOGIC;
@@ -121,6 +125,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			ldpc      : OUT STD_LOGIC;
 			wrd_gp_int : OUT STD_LOGIC;
 			wrd_gp_fp : OUT STD_LOGIC;
+			wrd_simd  : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
 			wr_m      : OUT STD_LOGIC;
 			ldir      : OUT STD_LOGIC;
 			ins_dad   : OUT STD_LOGIC;
@@ -146,6 +151,9 @@ ARCHITECTURE Structure OF unidad_control IS
 	SIGNAL wr_m_signal      : std_logic;
 	SIGNAL wrd_gp_int_signal : std_logic;
 	SIGNAL wrd_gp_fp_signal : std_logic;
+	
+	SIGNAL wrd_simd_signal : STD_LOGIC_VECTOR(3 DOWNTO 0);
+	
 	SIGNAL ldpc_signal      : std_logic;
 	SIGNAL ldir_signal      : std_logic;
 
@@ -166,7 +174,8 @@ BEGIN
 		wrd_gp_int    => wrd_gp_int_signal,
 		wrd_gp_fp     => wrd_gp_fp_signal,
 		sel_br        => sel_br_s, 
-		d_sys         => d_sys_s, 
+		d_sys         => d_sys_s,
+		wrd_simd 	  => wrd_simd_signal,
 		b_br 			  => b_br,
 		sel_alu_w	  => sel_alu_w,
 		sel_mem_dat	  => sel_mem_dat,
@@ -190,10 +199,10 @@ BEGIN
 		calls         => calls_s,
 		instr_protected => instr_protected,
 		flush         => flush,
-		wr_tlb_pi      => wr_tlb_pi,
-		wr_tlb_pd      => wr_tlb_pd,
-		wr_tlb_vi      => wr_tlb_vi,
-		wr_tlb_vd      => wr_tlb_vd
+		wr_tlb_pi     => wr_tlb_pi,
+		wr_tlb_pd     => wr_tlb_pd,
+		wr_tlb_vi     => wr_tlb_vi,
+		wr_tlb_vd     => wr_tlb_vd
 	);
  
 	logicamulticiclo : multi
@@ -205,12 +214,14 @@ BEGIN
 		wrd_gp_int_l => wrd_gp_int_signal,
 		wrd_gp_fp_l  => wrd_gp_fp_signal,	
 		sel_br_l   => sel_br_s, 
-		d_sys_l   => d_sys_s, 
+		d_sys_l   => d_sys_s,
+		wrd_simd_l => wrd_simd_signal,
 		wr_m_l    => wr_m_signal, 
 		w_b       => word_byte_signal, 
 		ldpc      => load_pc, 
 		wrd_gp_int => wrd_gp_int,
-		wrd_gp_fp  => wrd_gp_fp, 
+		wrd_gp_fp  => wrd_gp_fp,
+		wrd_simd => wrd_simd,
 		wr_m      => wr_m, --Cambiado
 		ldir      => ldir_signal, 
 		ins_dad   => ins_dad, 

@@ -24,9 +24,12 @@ ENTITY control_l IS
 		rd_in         : OUT STD_LOGIC;
 		wr_out        : OUT STD_LOGIC;
 		low_ir        : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
+		
+		--SIMD
+		wrd_simd		  : OUT STD_LOGIC_VECTOR(3 DOWNTO 0); --permis escriptura simdBR
  
 		d_sys         : OUT STD_LOGIC; --permis escriptura sysBR
-		sel_br        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
+		sel_br        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, 10-> BRfp, 11->BRsimd
 		b_br			  : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
 		sel_alu_w	  : OUT STD_LOGIC; --indica si hem de seleccionar la w de la ALU INT o FP
 		sel_mem_dat	  : OUT STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
@@ -56,19 +59,28 @@ ARCHITECTURE Structure OF control_l IS
 BEGIN
 	operation <= ir(15 DOWNTO 12) & ir(8 DOWNTO 6) & "000" WHEN ir(15 DOWNTO 12) = "0101" OR ir(15 DOWNTO 12) = "0110" OR ir(15 DOWNTO 12) = "0111" ELSE
 	             ir(15 DOWNTO 12) & ir(2 DOWNTO 0) & "000" WHEN ir(15 DOWNTO 12) = "1010" ELSE
-	             ir(15 DOWNTO 12) & ir(5 DOWNTO 0) WHEN ir(15 DOWNTO 12) = "1111" ELSE
+	             ir(15 DOWNTO 12) & ir(5 DOWNTO 0) WHEN (ir(15 DOWNTO 12) = "1111" and ir(5) = '1') OR (ir(15 DOWNTO 12) = "1010" and ir(5) = '1') ELSE --ADD/SUB simd
+					 ir(15 DOWNTO 12) & ir(11 DOWNTO 9) & "000" WHEN ir(15 DOWNTO 12) = "1111" and ir(5) = '0' ELSE --simd_LD i simd_ST
 	             ir(15 DOWNTO 12) & ir(5 DOWNTO 3) & "000";
 	-- "00" when ir(15 downto 12)="0101" and ir(8)='0' else
 	-- "01" when ir(15 downto 12)="0101" and ir(8)='1' else
 	-- "10"; -- when ir(15 downto 12) es 0011 o 0100 o 1101 o 1110
 	low_ir        <= ir (5 DOWNTO 0);
+	
+	--SIMD
+	wrd_simd <= "0001" WHEN (ir(15 DOWNTO 9) = "1111000" AND ir(5) = '0') OR (ir(15 DOWNTO 5) = "10100000001" AND ir(1 DOWNTO 0) = "01") ELSE --simd_LD(rd0)/ SUB/ADD 2 Bytes
+					"0010" WHEN  ir(15 DOWNTO 9) = "1111001" AND ir(5) = '0' ELSE --simd_LD(rd1)
+					"0100" WHEN  ir(15 DOWNTO 9) = "1111010" AND ir(5) = '0' ELSE --simd_LD(rd2)
+					"1000" WHEN  ir(15 DOWNTO 9) = "1111011" AND ir(5) = '0' ELSE --simd_LD(rd3)
+					"0011" WHEN  ir(15 DOWNTO 5) = "10100000001" AND (ir(1 DOWNTO 0) = "00" OR ir(1 DOWNTO 0) = "10") ELSE
+					"0000"; 
  
-	invalid_instr <= '1' WHEN (ir(15 DOWNTO 12) = "1010" AND (ir(5 DOWNTO 3) /= "000" OR ir(2 DOWNTO 0) = "010" OR ir(2 DOWNTO 0) = "101" OR ir(2 DOWNTO 0) = "110")) OR -- Jumps
+	invalid_instr <= '1' WHEN (ir(15 DOWNTO 12) = "1010" AND (ir(5 DOWNTO 3) /= "000" OR ir(2 DOWNTO 0) = "010" OR ir(2 DOWNTO 0) = "101" OR ir(2 DOWNTO 0) = "110") AND ir(5) = '0') OR -- Jumps and ADD/SUB simd
 	                 (ir(15 DOWNTO 12) = "0001" AND (ir(5 DOWNTO 3) = "010" OR ir(5 DOWNTO 3) = "110" OR ir(5 DOWNTO 3) = "111")) OR -- Compare Instructions
 	                 (ir(15 DOWNTO 12) = "1000" AND (ir(5 DOWNTO 3) = "011" OR ir(5 DOWNTO 3) = "110" OR ir(5 DOWNTO 3) = "111")) OR -- Multiplicacion Division
 --	                 (ir(15 DOWNTO 12) = "1001") OR -- Floats
 --	                 ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" OR -- Load Store Floats
-					 (ir(15 DOWNTO 12) = "1111" AND (ir(5) = '0' OR (ir(4 DOWNTO 0) /= "00000" AND ir(4 DOWNTO 0) /= "00001" 
+					      (ir(15 DOWNTO 12) = "1111" AND ((ir(4 DOWNTO 0) /= "00000" AND ir(4 DOWNTO 0) /= "00001" -- ir(5) -> simd_LD i simd_ST
 							 AND ir(4 DOWNTO 0) /= "00100" AND ir(4 DOWNTO 0) /= "01000" AND ir(4 DOWNTO 0) /= "01100" 
 							 AND ir(4 DOWNTO 0) /= "10000"  AND ir(4 DOWNTO 0) /= "10100" AND ir(4 DOWNTO 0) /= "10101" 
 							 AND ir(4 DOWNTO 0) /= "10110" AND ir(4 DOWNTO 0) /= "10111" AND ir(4 DOWNTO 0) /= "11000"
@@ -76,7 +88,7 @@ BEGIN
 	                 '0';
 
 	
-	instr_protected <= '1' when (ir(15 DOWNTO 12) = "1111" AND (ir(5) = '0' OR (ir(4 DOWNTO 0) = "00000" OR ir(4 DOWNTO 0) = "00001" 
+	instr_protected <= '1' when (ir(15 DOWNTO 12) = "1111" AND ((ir(4 DOWNTO 0) = "00000" OR ir(4 DOWNTO 0) = "00001" 
 									OR ir(4 DOWNTO 0) = "00100" OR ir(4 DOWNTO 0) = "01000" OR ir(4 DOWNTO 0) = "01100" 
 									OR ir(4 DOWNTO 0) = "10000" OR ir(4 DOWNTO 0) = "10100" OR ir(4 DOWNTO 0) = "10101" 
 									OR ir(4 DOWNTO 0) = "10110" OR ir(4 DOWNTO 0) = "10111" OR ir(4 DOWNTO 0) = "11000"))) 
@@ -108,8 +120,9 @@ BEGIN
 						OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0110" OR operation(9 DOWNTO 5) = "10100" OR operation(9 DOWNTO 5) = "01111"  
 						OR (ir(15 DOWNTO 12) = "1001" AND ir(5 DOWNTO 3) = "000") OR (ir(15 DOWNTO 12) = "1001" AND ir(5 DOWNTO 3) = "001")
 					   OR (ir(15 DOWNTO 12) = "1001" AND ir(5 DOWNTO 3) = "010") OR (ir(15 DOWNTO 12) = "1001" AND ir(5 DOWNTO 3) = "011")	
-						OR ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" ELSE
-					  
+						OR ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" 
+						OR (ir(15 DOWNTO 12) = "1111" AND ir(5) = '0') --simd_LD i simd_ST 
+						OR (ir(15 DOWNTO 12) = "1010" AND ir(5) = '1') ELSE --ADD/SUB simd
 					  '1';
 				
 	wrd_gp_fp <= '1' WHEN (ir(15 DOWNTO 12) = OP_COMP_FLOAT AND ir(5 DOWNTO 3) = "000") OR --ADDF
@@ -122,7 +135,8 @@ BEGIN
 	d_sys <= '1' WHEN ir(15 DOWNTO 12) = "1111" AND ir(5 DOWNTO 0) = "110000" ELSE
 	         '0';
 	
-	sel_br <= "10" WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT ELSE --OR ir(15 DOWNTO 12) = ST_FLOAT ELSE --BRfp
+	sel_br <= "11" WHEN ir(15 DOWNTO 12) = "1111" AND ir(5) = '0' ELSE --simd_LD i simd_ST --BRsimd
+				 "10" WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT ELSE --OR ir(15 DOWNTO 12) = ST_FLOAT ELSE --BRfp
 				 "01" WHEN ir(15 DOWNTO 12) = "1111" AND (ir(5 DOWNTO 0) = "101100" OR ir(5 DOWNTO 0) = "100100") ELSE --BRsys
 				 "00"; --BRint
 				 
@@ -143,9 +157,11 @@ BEGIN
 	addr_b <= ir(11 DOWNTO 9) WHEN ir(15 DOWNTO 12) = "0100" OR ir(15 DOWNTO 12) = "0110" OR ir(15 DOWNTO 12) = "0111" 
 						OR ir(15 DOWNTO 12) = "1010" OR ir(15 DOWNTO 12) = "1110"
 						OR ir(15 DOWNTO 12) = "1111" OR ir(15 DOWNTO 12) = ST_FLOAT ELSE
+				 std_logic_vector(resize(signed(ir(10 DOWNTO 9)), addr_b'length)) WHEN ir(15 DOWNTO 12) = "1111" AND ir(5) = '0' ELSE --simd_LD i simd_ST
 				 ir(2 DOWNTO 0);
  
-	addr_d <= ir(11 DOWNTO 9);
+	addr_d <= std_logic_vector(resize(signed(ir(10 DOWNTO 9)), addr_b'length)) WHEN ir(15 DOWNTO 12) = "1111" AND ir(5) = '0' ELSE --simd_LD i simd_ST
+				 ir(11 DOWNTO 9);
  
 	WITH ir(15 DOWNTO 12) SELECT
 	addr_a <= ir(11 DOWNTO 9) WHEN "0101", 
@@ -157,20 +173,26 @@ BEGIN
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1110", 
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "0011", 
 	         std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "0100",
-			 std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1011", --LDF
-			 std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1100", --STF
+			   std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1011", --LDF
+			   std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN "1100", --STF
+				std_logic_vector(resize(signed(ir(4 DOWNTO 0)), immed'length)) WHEN "1111", --pel simd_LD i simd_ST
 	         std_logic_vector(resize(signed(ir(7 DOWNTO 0)), immed'length)) WHEN OTHERS;
  
  
-	WITH ir(15 DOWNTO 12) SELECT
-	wr_m <= '1' WHEN "0100", --ST
-	        '1' WHEN "1110", --STB
-			  '1' WHEN "1100", --STF
-	        '0' WHEN OTHERS;
+--	WITH ir(15 DOWNTO 12) SELECT
+--	wr_m <= '1' WHEN "0100", --ST
+--	        '1' WHEN "1110", --STB
+--			  '1' WHEN "1100", --STF
+--			  '1' WHEN 
+--	        '0' WHEN OTHERS;
+
+   wr_m <= '1' WHEN ir(15 DOWNTO 12) = "0100" OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "1110" OR --ST/STB/STF
+						  (ir(15 DOWNTO 11) = "11111" AND ir(5) = '0')  ELSE --simd_ST
+			  '0';
  
 	in_d <= "11" WHEN ir(15 DOWNTO 12) = "0111" OR (ir(15 DOWNTO 12) = "1111" AND ir(5 DOWNTO 0) = "101000") ELSE --IN or GETTID
 	        "10" WHEN ir(15 DOWNTO 12) = "1010" AND ir(2 downto 0) = "100" 		ELSE --PC
-	        "01" WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "1101" OR ir(15 downto 12) = LD_FLOAT ELSE --MEM
+	        "01" WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "1101" OR ir(15 downto 12) = LD_FLOAT OR (ir(15 downto 11) = "11110" AND ir(5) = '0') ELSE --MEM
 	        "00"; --ALU
  
 	immed_x2 <= '1' WHEN ir(15 DOWNTO 12) = "0011" OR ir(15 DOWNTO 12) = "0100" OR ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" ELSE
@@ -184,11 +206,9 @@ BEGIN
 	op <= operation;
 	
 	sel_alu_w <= '1' WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT ELSE
-	
 					 '0'; -- Solo cuando utilizas la ALU FP 
 	
 	sel_mem_dat <= '1' WHEN ir(15 DOWNTO 12) = ST_FLOAT ELSE
-	
 						'0';
 	
 END Structure;
