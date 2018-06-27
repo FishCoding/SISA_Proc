@@ -60,7 +60,7 @@ BEGIN
 	operation <= ir(15 DOWNTO 12) & ir(8 DOWNTO 6) & "000" WHEN ir(15 DOWNTO 12) = "0101" OR ir(15 DOWNTO 12) = "0110" OR ir(15 DOWNTO 12) = "0111" ELSE
 	             ir(15 DOWNTO 12) & ir(2 DOWNTO 0) & "000" WHEN ir(15 DOWNTO 12) = "1010" AND ir(5 downto 3) = "000" ELSE --Jumps
 					 ir(15 downto 12) & ir(4) & ir(1 downto 0) & "100" when ir(15 DOWNTO 5) = "10100000001" ELSE --ADD/SUB SIMD
-					 ir(15 DOWNTO 12) & ir(5) & ir(11) & "0000" WHEN ir(15 DOWNTO 12) = "1111" and ir(5) = '0' ELSE --simd_LD i simd_ST
+					 ir(15 DOWNTO 12) & ir(5) & ir(11) & "0000" WHEN ir(15 DOWNTO 12) = "1111" and ir(5) = '0' ELSE --simd_LD i simd_ST 
 					 ir(15 downto 12) & ir(5 downto 0) when ir(15 DOWNTO 12) = "1111" and ir(5) = '1' ELSE
 	             ir(15 DOWNTO 12) & ir(5 DOWNTO 3) & "000";
 

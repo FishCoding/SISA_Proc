@@ -284,8 +284,8 @@ begin
 		  r3     => r3_simd
 	);
 	
-	d0_simd <= datard_m when op(9 downto 6) = "1111" else salida_alu_simd0;
-	d1_simd <= datard_m when op(9 downto 6) = "1111" else salida_alu_simd1;
+	d0_simd <= datard_m when op(9 downto 0) = "1111000000" else salida_alu_simd0;
+	d1_simd <= datard_m when op(9 downto 0) = "1111000000" else salida_alu_simd1;
 	d2_simd <= datard_m;
 	d3_simd <= datard_m;
 	

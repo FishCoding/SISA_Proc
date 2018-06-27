@@ -99,6 +99,6 @@ BEGIN
           w0_sub;
     
     w1 <= w1_add when op(2) = '0' else
-          w0_sub;
+          w1_sub;
 
 END Structure;

@@ -73,7 +73,7 @@ BEGIN
 												(op(9 DOWNTO 6) = "0100" OR  op(9 DOWNTO 6) = "1110"
 												 OR op(9 DOWNTO 6) = "1100" OR op(9 DOWNTO 4) = "111101") ELSE '0'; --STF i ST SIMD
  
-	excepr <= NOT(system) AND (calls OR illegal_mem_access_s OR instr_protected_s OR illegal_addr_s OR invalid_instr OR invalid_division OR 
+	excepr <= NOT(system) AND (calls OR instr_protected_s OR illegal_addr_s OR invalid_instr OR invalid_division OR 
 								tlb_miss_inst_s OR tlb_miss_datos_s OR tlb_invalid_inst_s OR tlb_invalid_datos_s OR tlb_prot_inst_s OR
 								tlb_prot_datos_s OR tlb_lectura_datos_s OR invalid_division_fp OR overflow_fp);-- calls_s or
 
