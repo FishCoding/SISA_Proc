@@ -79,21 +79,21 @@ BEGIN
 --Escollir sortides
     with op(1 downto 0) select
         w0_add <= add_word_0 when "00",
-                  add_byte_mode0_0 & add_byte_mode0_1 when "01",
-                  add_byte_mode1_0 & add_byte_mode1_1 when others; -- "10"
+                  add_byte_mode0_1 & add_byte_mode0_0 when "01",
+                  add_byte_mode1_1 & add_byte_mode1_0 when others; -- "10"
 
     with op(1 downto 0) select
         w1_add <= add_word_1 when "00",
-                  add_byte_mode1_2 & add_byte_mode1_3 when others; -- "10"
+                  add_byte_mode1_3 & add_byte_mode1_2 when others; -- "10"
 
     with op(1 downto 0) select
         w0_sub <= sub_word_0 when "00",
-                  sub_byte_mode0_0 & sub_byte_mode0_1 when "01",
-                  sub_byte_mode1_0 & sub_byte_mode1_1 when others; -- "10"
+                  sub_byte_mode0_1 & sub_byte_mode0_0 when "01",
+                  sub_byte_mode1_1 & sub_byte_mode1_0 when others; -- "10"
 
     with op(1 downto 0) select
         w1_sub <= sub_word_1 when "00",
-                  sub_byte_mode1_2 & sub_byte_mode1_3 when others; -- "10"
+                  sub_byte_mode1_3 & sub_byte_mode1_2 when others; -- "10"
 
     w0 <= w0_add when op(2) = '0' else
           w0_sub;
