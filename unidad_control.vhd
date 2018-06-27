@@ -33,7 +33,7 @@ ENTITY unidad_control IS
 		wrd_simd		  : OUT STD_LOGIC_VECTOR(3 DOWNTO 0); --permis escriptura simdBR
 		b_br			  : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
 		sel_alu_w	  : OUT STD_LOGIC; --indica si hem de seleccionar la w de la ALU INT o FP
-		sel_mem_dat	  : OUT STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
+		sel_mem_dat	  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --inidica de que BR se escoge el dato a escribir en memoria
 		sys           : OUT STD_LOGIC;
 		enable_int    : OUT STD_LOGIC;
 		disable_int   : OUT STD_LOGIC;
@@ -92,7 +92,7 @@ ARCHITECTURE Structure OF unidad_control IS
 			sel_br        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
 			b_br			  : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
 			sel_alu_w	  : OUT STD_LOGIC; --indica si hem de seleccionar la w de la ALU INT o FP
-			sel_mem_dat	  : OUT STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
+			sel_mem_dat	  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --inidica de que BR se escoge el dato a escribir en memoria
 			enable_int    : OUT STD_LOGIC;
 			disable_int   : OUT STD_LOGIC;
 			reti          : OUT STD_LOGIC;

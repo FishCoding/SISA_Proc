@@ -12,7 +12,7 @@ entity datapath is
 		d_sys : in STD_LOGIC;
 		wrd_simd		     : IN STD_LOGIC_VECTOR(3 DOWNTO 0); --permis escriptura simdBR
 		sel_alu_w : IN STD_LOGIC;
-		sel_mem_dat	: IN STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
+		sel_mem_dat	: IN STD_LOGIC_VECTOR(1 downto 0); --inidica de que BR se escoge el dato a escribir en memoria
 		sel_br : in STD_LOGIC_VECTOR(1 downto 0);
 		addr_a : in STD_LOGIC_VECTOR(2 downto 0);
 		addr_d : in STD_LOGIC_VECTOR(2 downto 0);
@@ -69,6 +69,17 @@ architecture Structure of datapath is
 			 overflow : OUT STD_LOGIC;
 		    clk : IN STD_LOGIC
 			 ); 
+	end component;
+	
+	component alu_simd IS 
+    PORT (a0 : IN  STD_LOGIC_VECTOR(15 DOWNTO 0); 
+          a1 : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+          a2 : IN  STD_LOGIC_VECTOR(15 DOWNTO 0); 
+          a3 : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+          op : IN  STD_LOGIC_VECTOR(2 DOWNTO 0); --Bit 2 ADD/SUB, Bits 1 i 0: 00 Word, 01 2Bytes, 10 4Bytes 
+          w0 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+          w1 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+		  ); 
 	end component;
  
 	component regfile is
@@ -131,9 +142,11 @@ architecture Structure of datapath is
 	signal Rb_N : std_logic_vector(15 downto 0);
 	signal b_GP_INT : std_logic_vector (15 downto 0);
 	signal b_GP_FP  : std_logic_vector (15 downto 0);
+	signal b_GP_SIMD  : std_logic_vector (15 downto 0);
 	signal a_S : std_logic_vector(15 downto 0);
 	signal a_GP_INT : std_logic_vector(15 downto 0);
 	signal a_GP_FP  : std_logic_vector(15 downto 0);
+	signal a_GP_SIMD  : std_logic_vector(15 downto 0);
 
  
 	signal write_reg : std_logic_vector(15 downto 0);
@@ -154,6 +167,8 @@ architecture Structure of datapath is
 	signal d1_simd : std_logic_vector(15 downto 0);
 	signal d2_simd : std_logic_vector(15 downto 0);
 	signal d3_simd : std_logic_vector(15 downto 0);
+	signal salida_alu_simd0 : std_logic_vector(15 downto 0);
+	signal salida_alu_simd1 : std_logic_vector(15 downto 0);
 
 begin
 
@@ -201,8 +216,15 @@ begin
 
 	jump_addr <= a_leer;
  
-	data_wr <= b_GP_INT WHEN sel_mem_dat = '0' ELSE
-				  b_GP_FP; -- En memoria puede ir tanto un float como un INT
+	with addr_b(1 downto 0) select
+		b_GP_SIMD <= r0_simd when "00",
+						 r1_simd when "01",
+						 r2_simd when "10",
+						 r3_simd when others; --"11"
+	
+	data_wr <= b_GP_SIMD WHEN sel_mem_dat = "10" ELSE
+				  b_GP_INT  WHEN sel_mem_dat = "00" ELSE
+				  b_GP_FP; -- En memoria puede ir tanto un float como un INT como un SIMD
  
 	wr_io <= b_GP_INT;
  
@@ -212,7 +234,6 @@ begin
 	         op(9 downto 3) = "1010011" or
 	         op(9 downto 3) = "1010100"  else
 	         "00";
-	-- mover al control l
 	
 	a <= a_GP_INT; -- SON COSAS DE LA TLB SIEMPRE DEL REG DE ENTEROS
 	b <= b_GP_INT;
@@ -258,6 +279,11 @@ begin
 		  r3     => r3_simd
 	);
 	
+	d0_simd <= datard_m when op(9 downto 6) = "1111" else salida_alu_simd0;
+	d1_simd <= datard_m when op(9 downto 6) = "1111" else salida_alu_simd1;
+	d2_simd <= datard_m;
+	d3_simd <= datard_m;
+	
 	regS : system_regfile
 	port map(
 		clk => clk, 
@@ -302,6 +328,18 @@ begin
 		overflow => overflow_signal,
 		clk => clk_50
 	); 
+	
+	aluSIMD : alu_simd 
+   port map (
+		a0 => r0_simd,
+      a1 => r1_simd,
+      a2 => r2_simd,
+      a3 => r3_simd,
+      op => op(5 downto 3),
+      w0 => salida_alu_simd0,
+      w1 => salida_alu_simd1
+	); 
+	
 	
 	overflow_fp <= overflow_signal;
 	invalid_division_fp <= exc_invalid_division;

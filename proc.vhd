@@ -68,7 +68,7 @@ ARCHITECTURE Structure OF proc IS
 			d_sys            : IN STD_LOGIC;
 			wrd_simd		     : IN STD_LOGIC_VECTOR(3 DOWNTO 0); --permis escriptura simdBR
 			sel_alu_w 		  : IN STD_LOGIC;
-			sel_mem_dat	  	  : IN STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
+			sel_mem_dat	  	  : IN STD_LOGIC_VECTOR(1 DOWNTO 0); --inidica de que BR se escoge el dato a escribir en memoria
 			sel_br           : IN STD_LOGIC_VECTOR (1 DOWNTO 0);
 			addr_a           : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d           : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -129,7 +129,7 @@ ARCHITECTURE Structure OF proc IS
 			d_sys           : OUT STD_LOGIC; --permis escriptura sysBR
 			wrd_simd		    : OUT STD_LOGIC_VECTOR(3 DOWNTO 0); --permis escriptura simdBR
 			sel_br          : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --indica d'on agafar el valor a: 00 -> BRint, 01-> BRsys, others-> BRfp
-			sel_mem_dat	    : OUT STD_LOGIC; --inidica de que BR se escoge el dato a escribir en memoria
+			sel_mem_dat	    : OUT STD_LOGIC_VECTOR(1 DOWNTO 0); --inidica de que BR se escoge el dato a escribir en memoria
 			b_br			    : OUT STD_LOGIC; --indica d'on agafar el valor b: 0 -> BRint, 1 ->BRfp
 			sel_alu_w	  	 : OUT STD_LOGIC; --indica si hem de seleccionar la w de la ALU INT o FP
 			sys             : OUT STD_LOGIC;
@@ -225,7 +225,7 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL wrd_simd_s			  : STD_LOGIC_VECTOR(3 DOWNTO 0);
 	SIGNAL b_br_s             : std_logic;
 	SIGNAL sel_alu_s			  : std_logic;
-	SIGNAL sel_mem_dat_s		  : std_logic;
+	SIGNAL sel_mem_dat_s		  : std_logic_vector(1 downto 0);
 	SIGNAL sys_s              : std_logic;
  
 	SIGNAL enable_int_s       : std_logic;

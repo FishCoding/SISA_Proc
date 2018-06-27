@@ -16,7 +16,7 @@ ENTITY simd_regfile IS
           r0     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           r1     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           r2     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		  r3     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+		    r3     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
 END simd_regfile;
 
 ARCHITECTURE Structure OF simd_regfile IS

@@ -54,15 +54,24 @@ BEGIN
  
 --	value_data          <= addr WHEN addr(1) = '1' AND byte_word = '1' AND (op(9 DOWNTO 6) = x"3" OR op(9 DOWNTO 6) = x"4") ELSE
 --								  "XXXXXXXXXXXXXXXX";
+--					 ir(15 DOWNTO 11) & "00000" WHEN ir(15 DOWNTO 12) = "1111" and ir(5) = '0' ELSE --simd_LD i simd_ST
 
 	instr_protected_s <= instr_protected WHEN estado_cpu = "01" ELSE '0';
 	tlb_miss_inst_s     <= '1' WHEN tlb_miss_inst = '1' AND estado_cpu = "00" ELSE '0';
-	tlb_miss_datos_s    <= '1' WHEN tlb_miss_datos = '1' AND estado_cpu = "01" AND (op(9 DOWNTO 6)= "0011" OR op(9 DOWNTO 6) = "0100" OR op(9 DOWNTO 6) = "1101" OR op(9 DOWNTO 6) = "1110") ELSE '0';
+	tlb_miss_datos_s    <= '1' WHEN tlb_miss_datos = '1' AND estado_cpu = "01" AND 
+												(op(9 DOWNTO 6)= "0011" OR op(9 DOWNTO 6) = "0100" OR op(9 DOWNTO 6) = "1101" OR op(9 DOWNTO 6) = "1110"
+												 OR op(9 DOWNTO 6) = "1011" OR op(9 DOWNTO 6) = "1100" OR op(9 DOWNTO 5) = "11110") ELSE '0'; --LDF, STF i LD/ST SIMD
 	tlb_invalid_inst_s  <= '1' WHEN tlb_invalid_inst = '1' AND estado_cpu = "00" ELSE '0';
-	tlb_invalid_datos_s <= '1' WHEN tlb_invalid_datos = '1' AND estado_cpu = "01" AND (op(9 DOWNTO 6)= "0011" OR op(9 DOWNTO 6) = "0100" OR op(9 DOWNTO 6) = "1101" OR op(9 DOWNTO 6) = "1110") ELSE '0';
+	tlb_invalid_datos_s <= '1' WHEN tlb_invalid_datos = '1' AND estado_cpu = "01" AND 
+												(op(9 DOWNTO 6)= "0011" OR op(9 DOWNTO 6) = "0100" OR op(9 DOWNTO 6) = "1101" OR op(9 DOWNTO 6) = "1110"
+												 OR op(9 DOWNTO 6) = "1011" OR op(9 DOWNTO 6) = "1100" OR op(9 DOWNTO 5) = "11110") ELSE '0'; --LDF, STF i LD/ST SIMD
 	tlb_prot_inst_s     <= '1' WHEN estado_cpu = "00" AND state_word(0) = '0' AND addr > x"BFFF" ELSE '0';
-	tlb_prot_datos_s    <= '1' WHEN estado_cpu = "01" AND state_word(0) = '0' AND addr > x"BFFF" AND (op(9 DOWNTO 6)= "0011" OR op(9 DOWNTO 6) = "0100" OR op(9 DOWNTO 6) = "1101" OR op(9 DOWNTO 6) = "1110") ELSE '0';
-	tlb_lectura_datos_s <= '1' WHEN tlb_lectura_datos_s = '1' AND estado_cpu = "01" AND  (op(9 DOWNTO 6) = "0100" OR  op(9 DOWNTO 6) = "1110") ELSE '0';
+	tlb_prot_datos_s    <= '1' WHEN estado_cpu = "01" AND state_word(0) = '0' AND addr > x"BFFF" AND 
+												(op(9 DOWNTO 6)= "0011" OR op(9 DOWNTO 6) = "0100" OR op(9 DOWNTO 6) = "1101" OR op(9 DOWNTO 6) = "1110"
+												 OR op(9 DOWNTO 6) = "1011" OR op(9 DOWNTO 6) = "1100" OR op(9 DOWNTO 5) = "11110") ELSE '0'; --LDF, STF i LD/ST SIMD
+	tlb_lectura_datos_s <= '1' WHEN tlb_lectura_datos_s = '1' AND estado_cpu = "01" AND  
+												(op(9 DOWNTO 6) = "0100" OR  op(9 DOWNTO 6) = "1110"
+												 OR op(9 DOWNTO 6) = "1100" OR op(9 DOWNTO 4) = "111101") ELSE '0'; --STF i ST SIMD
  
 	excepr <= NOT(system) AND (calls OR illegal_mem_access_s OR instr_protected_s OR illegal_addr_s OR invalid_instr OR invalid_division OR 
 								tlb_miss_inst_s OR tlb_miss_datos_s OR tlb_invalid_inst_s OR tlb_invalid_datos_s OR tlb_prot_inst_s OR
