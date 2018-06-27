@@ -58,8 +58,8 @@ ARCHITECTURE Structure OF control_l IS
  
 BEGIN
 	operation <= ir(15 DOWNTO 12) & ir(8 DOWNTO 6) & "000" WHEN ir(15 DOWNTO 12) = "0101" OR ir(15 DOWNTO 12) = "0110" OR ir(15 DOWNTO 12) = "0111" ELSE
-	             ir(15 DOWNTO 12) & ir(2 DOWNTO 0) & "000" WHEN ir(15 DOWNTO 12) = "1010" AND ir(4 downto 2) = "000" ELSE --Jumps
-					 ir(15 downto 12) & ir(4) & ir(1 downto 0) & "000" when ir(15 DOWNTO 5) = "10100000001" ELSE --ADD/SUB SIMD
+	             ir(15 DOWNTO 12) & ir(2 DOWNTO 0) & "000" WHEN ir(15 DOWNTO 12) = "1010" AND ir(5 downto 3) = "000" ELSE --Jumps
+					 ir(15 downto 12) & ir(4) & ir(1 downto 0) & "100" when ir(15 DOWNTO 5) = "10100000001" ELSE --ADD/SUB SIMD
 					 ir(15 DOWNTO 12) & ir(5) & ir(11) & "0000" WHEN ir(15 DOWNTO 12) = "1111" and ir(5) = '0' ELSE --simd_LD i simd_ST
 					 ir(15 downto 12) & ir(5 downto 0) when ir(15 DOWNTO 12) = "1111" and ir(5) = '1' ELSE
 	             ir(15 DOWNTO 12) & ir(5 DOWNTO 3) & "000";
@@ -87,12 +87,12 @@ BEGIN
 	                 '0';
 
 	
-	instr_protected <= '1' when (ir(15 DOWNTO 12) = "1111" AND ((ir(4 DOWNTO 0) = "00000" OR ir(4 DOWNTO 0) = "00001" 
+	instr_protected <= '1' when (ir(15 DOWNTO 12) = "1111" AND ir(5) = '1' AND((ir(4 DOWNTO 0) = "00000" OR ir(4 DOWNTO 0) = "00001" 
 									OR ir(4 DOWNTO 0) = "00100" OR ir(4 DOWNTO 0) = "01000" OR ir(4 DOWNTO 0) = "01100" 
 									OR ir(4 DOWNTO 0) = "10000" OR ir(4 DOWNTO 0) = "10100" OR ir(4 DOWNTO 0) = "10101" 
 									OR ir(4 DOWNTO 0) = "10110" OR ir(4 DOWNTO 0) = "10111" OR ir(4 DOWNTO 0) = "11000"))) 
 									and state_word(0) = '0'  else 
-					   '0'; --Añadir IN, OUT y HALT (?)
+					       '0'; --Añadir IN, OUT y HALT (?)
 
 
 	flush <= '1' when ir(15 downto 12) = "1111" and ir(5 downto 0) = "111000" and state_word(0) = '1' else '0';
@@ -115,8 +115,8 @@ BEGIN
  
 	addr_io <= ir(7 DOWNTO 0);
  
-	wrd_gp_int <= '0' WHEN (ir(15 DOWNTO 12) = "1111" AND ir(4 DOWNTO 0) /= "01100" AND ir(4 DOWNTO 0) /= "01000") OR ir(15 DOWNTO 12) = "0100" 
-						OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0110" OR operation(9 DOWNTO 5) = "10100" OR operation(9 DOWNTO 5) = "01111"  
+	wrd_gp_int <= '0' WHEN (ir(15 DOWNTO 12) = "1111" AND ir(5) = '1' AND ir(4 DOWNTO 0) /= "01100" AND ir(4 DOWNTO 0) /= "01000") OR ir(15 DOWNTO 12) = "0100" 
+						OR ir(15 DOWNTO 12) = "1110" OR ir(15 DOWNTO 12) = "0110" OR (ir(15 downto 12) = "1010" and ir(5 downto 0) = "000011") OR (ir(15 downto 12) = "0111" and ir(8) = '1')  
 						OR (ir(15 DOWNTO 12) = "1001" AND ir(5 DOWNTO 3) = "000") OR (ir(15 DOWNTO 12) = "1001" AND ir(5 DOWNTO 3) = "001")
 					   OR (ir(15 DOWNTO 12) = "1001" AND ir(5 DOWNTO 3) = "010") OR (ir(15 DOWNTO 12) = "1001" AND ir(5 DOWNTO 3) = "011")	
 						OR ir(15 DOWNTO 12) = "1011" OR ir(15 DOWNTO 12) = "1100" 
@@ -134,9 +134,9 @@ BEGIN
 	d_sys <= '1' WHEN ir(15 DOWNTO 12) = "1111" AND ir(5 DOWNTO 0) = "110000" ELSE
 	         '0';
 	
-	sel_br <= "11" WHEN ir(15 DOWNTO 12) = "1111" AND ir(5) = '0' ELSE --simd_LD i simd_ST --BRsimd
-				 "10" WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT ELSE --OR ir(15 DOWNTO 12) = ST_FLOAT ELSE --BRfp
-				 "01" WHEN ir(15 DOWNTO 12) = "1111" AND (ir(5 DOWNTO 0) = "101100" OR ir(5 DOWNTO 0) = "100100") ELSE --BRsys
+	--sel_br <= "11" WHEN ir(15 DOWNTO 12) = "1111" AND ir(5) = '0' ELSE --simd_LD i simd_ST --BRsimd
+	sel_br <= "10" WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT ELSE --OR ir(15 DOWNTO 12) = ST_FLOAT ELSE --BRfp
+		       "01" WHEN ir(15 DOWNTO 12) = "1111" AND (ir(5 DOWNTO 0) = "101100" OR ir(5 DOWNTO 0) = "100100") ELSE --BRsys
 				 "00"; --BRint
 				 
 	b_br <= '1' WHEN ir(15 DOWNTO 12) = OP_COMP_FLOAT OR ir(15 DOWNTO 12) = ST_FLOAT ELSE --OP/CMP FP or STF
@@ -159,8 +159,7 @@ BEGIN
 				 "0" & ir(10 DOWNTO 9) WHEN ir(15 DOWNTO 12) = "1111" AND ir(5) = '0' ELSE --simd_LD i simd_ST
 				 ir(2 DOWNTO 0);
  
-	addr_d <= std_logic_vector(resize(signed(ir(10 DOWNTO 9)), addr_b'length)) WHEN ir(15 DOWNTO 12) = "1111" AND ir(5) = '0' ELSE --simd_LD i simd_ST
-				 ir(11 DOWNTO 9);
+	addr_d <= ir(11 DOWNTO 9);
  
 	WITH ir(15 DOWNTO 12) SELECT
 	addr_a <= ir(11 DOWNTO 9) WHEN "0101", 

@@ -202,17 +202,22 @@ begin
 	
 	addr_m <= addr_m_s;
 	
-	with op(9 downto 6) select -- Immediato que va a la ALU
-	Rb_N <= inmediato when "0010", 
-	        inmediato when "0011", 
-	        inmediato when "0100", 
-	        inmediato when "1101", 
-	        inmediato when "1110", 
-	        inmediato when "0101",
-			  inmediato when "1011",
-			  inmediato when "1100", 
-			  b_GP_FP   when "1001",
-	        b_GP_INT 	when others;
+	Rb_N <= b_GP_FP when op(9 downto 6) = "1001" else
+			  inmediato when op(9 downto 6) = "0010" or op(9 downto 6) = "0011" or op(9 downto 6) = "0100" or op(9 downto 6) = "1101" or op(9 downto 6) = "1110" or
+								  op(9 downto 6) = "0101" or op(9 downto 6) = "1011" or op(9 downto 6) = "1100" or op(9 downto 5) = "11110" else
+				b_GP_INT;
+	--with op(9 downto 6) select -- Immediato que va a la ALU
+	--Rb_N <= inmediato when "0010", 
+	--        inmediato when "0011", 
+	 --       inmediato when "0100", 
+	   --     inmediato when "1101", 
+	     --   inmediato when "1110", 
+	       -- inmediato when "0101",
+			  --inmediato when "1011",
+			  --inmediato when "1100",
+			  --inmediato when "1111", 
+			  --b_GP_FP   when "1001",
+	        --b_GP_INT 	when others;
 
 	jump_addr <= a_leer;
  
@@ -229,10 +234,10 @@ begin
 	wr_io <= b_GP_INT;
  
 	tknbr <= "01" when (op(9 downto 5) = "01100" and z_s = '1') or(op(9 downto 5) = "01101" and z_s = '0') else
-	         "10" when (op(9 downto 3) = "1010000" and z_s = '1') or
-	         (op(9 downto 3) = "1010001" and z_s = '0') or
-	         op(9 downto 3) = "1010011" or
-	         op(9 downto 3) = "1010100"  else
+	         "10" when (op(9 downto 0) = "1010000000" and z_s = '1') or
+	         (op(9 downto 0) = "1010001000" and z_s = '0') or
+	         op(9 downto 0) = "1010011000" or
+	         op(9 downto 0) = "1010100000"  else
 	         "00";
 	
 	a <= a_GP_INT; -- SON COSAS DE LA TLB SIEMPRE DEL REG DE ENTEROS
